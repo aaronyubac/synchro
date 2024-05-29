@@ -141,7 +141,7 @@ func (app *application) userSignupPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = app.users.Insert(name, email, string(password))
+	err = app.users.Insert(form.Name, form.Email, form.Password)
 	if err != nil {
 		if errors.Is(err, models.ErrDuplicateEmail) {
 			form.AddFieldError("email", "Email is already in use")
@@ -218,7 +218,70 @@ func (app *application) userLoginPost(w http.ResponseWriter, r *http.Request) {
 	}
 
 	app.sessionManager.Put(r.Context(), "authenticatedUserID", id)
+}
 
-	fmt.Println(id)
+type eventJoinForm struct {
+	EventID string
+	validator.Validator
+}
+
+func (app *application) eventJoinGet(w http.ResponseWriter, r *http.Request) {
+	data := app.newTemplateData(r)
+	data.Form = eventJoinForm{}
+	app.render(w, r, http.StatusOK, "join.tmpl.html", data)
+}
+
+func (app *application) eventJoinPost(w http.ResponseWriter, r *http.Request) {
+
+	userID := app.sessionManager.GetInt(r.Context(), "authenticatedUserID")
+	if userID == 0 {
+		http.Redirect(w, r, "/user/login", http.StatusSeeOther)
+	}
+
+	r.ParseForm() // err???
+
+	form := eventJoinForm{
+		EventID: r.PostForm.Get("eventID"),
+	}
+
+	form.CheckField(validator.NotBlank(form.EventID), "eventID", "This field cannot be left blank")
+
+	if !form.Valid() {
+		data := app.newTemplateData(r)
+		data.Form = form
+		app.render(w, r, http.StatusUnprocessableEntity, "join.tmpl.html", data)
+		return
+	}
+
+	eventID, err := strconv.Atoi(form.EventID)
+	if err != nil {
+		app.serverError(w, r, err)
+		return
+	}
+
+	err = app.events.Join(userID, eventID)
+	if err != nil {
+		if errors.Is(err, models.ErrNoRecord) {
+
+			form.AddNonFieldError("Invalid Event ID")
+
+			data := app.newTemplateData(r)
+			data.Form = form
+			app.render(w, r, http.StatusNotFound, "join.tmpl.html", data)
+			
+		} else if errors.Is(err, models.ErrDuplicateEvent) {
+
+			form.AddNonFieldError("Already part of event")
+
+			data := app.newTemplateData(r)
+			data.Form = form
+			app.render(w, r, http.StatusUnprocessableEntity, "join.tmpl.html", data)
+		} else {
+			app.serverError(w, r, err)
+		}
+		return
+	}
+	
+	http.Redirect(w, r, fmt.Sprintf("/event/%s", form.EventID), http.StatusSeeOther)
 }
 

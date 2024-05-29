@@ -3,7 +3,6 @@ package models
 import (
 	"database/sql"
 	"errors"
-	"fmt"
 
 	"github.com/go-sql-driver/mysql"
 	"golang.org/x/crypto/bcrypt"
@@ -34,7 +33,6 @@ func (m *UserModel) Insert(name, email, password string) error {
 	if err != nil {
 		var mySQLError *mysql.MySQLError
 		if errors.As(err, &mySQLError) {
-			fmt.Println(mySQLError.Message)
 			if mySQLError.Number == 1062 {
 				return ErrDuplicateEmail
 			}
@@ -79,8 +77,6 @@ func (m *UserModel) Exists(id int) (bool, error) {
 	stmt := "SELECT EXISTS(SELECT true FROM users WHERE user_id = ?)"
 
 	err := m.DB.QueryRow(stmt, id).Scan(&exists)
-
-	fmt.Println(err)
 
 	return exists, err
 }

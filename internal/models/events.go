@@ -3,6 +3,8 @@ package models
 import (
 	"database/sql"
 	"errors"
+
+	"github.com/go-sql-driver/mysql"
 )
 
 type Event struct {
@@ -54,8 +56,22 @@ func (m *EventModel) Get(id int) (Event, error) {
 
 }
 
-/* func (m *EventModel) Join(id int) error {
+func (m *EventModel) Join(userID, eventID int) error {
 
-	// stmt := `INSERT INTO users_events (user_id, event_id) VALUES (?, ?)`
+	stmt := `INSERT INTO users_events (user_id, event_id) VALUES (?, ?)`
 
-} */
+	_, err := m.DB.Exec(stmt, userID, eventID)
+	if err != nil {
+		var mySQLError *mysql.MySQLError
+		if errors.As(err, &mySQLError) {
+			if mySQLError.Number == 1452 {
+				return ErrNoRecord
+			}
+			if mySQLError.Number == 1062 {
+				return ErrDuplicateEvent
+			}
+		}
+	}
+
+	return nil
+}
