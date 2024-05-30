@@ -35,7 +35,7 @@ func (m *EventModel) Create(name, details string) (int, error) {
 	return int(id), err
 }
 
-func (m *EventModel) Get(id int) (Event, error) {
+func (m *EventModel) GetEvent(id int) (Event, error) {
 
 	stmt := `SELECT * FROM events WHERE event_id = ?`
 
@@ -55,6 +55,47 @@ func (m *EventModel) Get(id int) (Event, error) {
 	return e, nil
 
 }
+
+func (m *EventModel) GetUserEvents(userID int) ([]Event, error) {
+
+	stmt := `SELECT e.event_id, e.event_name, e.event_details 
+			 FROM events e JOIN users_events ue
+			 ON e.event_id = ue.event_id
+			 WHERE ue.user_id = ?`
+
+	rows, err := m.DB.Query(stmt, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	var events []Event
+
+	for rows.Next() {
+		var e Event
+
+		err := rows.Scan(&e.ID, &e.Name, &e.Details)
+		if err != nil {
+			return nil, err
+		}
+
+		events = append(events, e)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return events, nil
+
+}
+
+
+
+
+
+
 
 func (m *EventModel) Join(userID, eventID int) error {
 

@@ -1,0 +1,23 @@
+{{define "title"}}Home{{end}}
+
+{{define "main"}}
+    <h2>Your Events</h2>
+    {{if .Events}}
+    <table>
+        <tr>
+            <th>Name</th>
+            <th>Details</th>
+            <th>ID</th>
+        </tr>
+        {{range .Events}}
+        <tr>
+            <td><a href="/event/{{.ID}}">{{.Name}}</a></td>
+            <td>{{.Details}}</td>
+            <td>{{.ID}}</td>
+        </tr>
+        {{end}}
+    </table>
+    {{else}}
+    <p>No Events</p>
+    {{end}}
+{{end}}

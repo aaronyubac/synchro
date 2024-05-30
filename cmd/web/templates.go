@@ -9,6 +9,7 @@ import (
 type templateData struct {
 	Form any
 	Event models.Event
+	Events []models.Event
 	Flash string
 	IsAuthenticated bool // so that we can toggle the contents of the navigation bar
 }

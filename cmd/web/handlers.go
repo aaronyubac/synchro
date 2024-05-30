@@ -10,7 +10,23 @@ import (
 )
 
 func (app *application) home(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "home")
+	
+	userID := app.sessionManager.GetInt(r.Context(), "authenticatedUserID")
+	if userID == 0 {
+		http.Redirect(w, r, "/user/login", http.StatusSeeOther)
+		return
+	}
+
+	events, err := app.events.GetUserEvents(userID)
+	if err != nil {
+		app.serverError(w, r, err)
+		return
+	}
+
+	data := app.newTemplateData(r)
+	data.Events = events
+
+	app.render(w, r, http.StatusOK, "home.tmpl.html", data)
 }
 
 
@@ -22,7 +38,7 @@ func (app *application) eventView(w http.ResponseWriter, r *http.Request) {
 		return 
 	}
 	
-	event, err := app.events.Get(id)
+	event, err := app.events.GetEvent(id)
 	if err != nil {
 		if errors.Is(err, models.ErrNoRecord) {
 			app.clientError(w, http.StatusNotFound) // CREATE app.NotFound as a wrapper around clientError?
@@ -174,7 +190,11 @@ type userLoginForm struct {
 
 func (app *application) userLoginPost(w http.ResponseWriter, r *http.Request) {
 
-	r.ParseForm()
+	err := r.ParseForm()
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
 
 	email := r.PostForm.Get("email")
 	password := r.PostForm.Get("password")
@@ -218,6 +238,8 @@ func (app *application) userLoginPost(w http.ResponseWriter, r *http.Request) {
 	}
 
 	app.sessionManager.Put(r.Context(), "authenticatedUserID", id)
+
+	http.Redirect(w, r, "/home", http.StatusSeeOther)
 }
 
 type eventJoinForm struct {
@@ -238,7 +260,11 @@ func (app *application) eventJoinPost(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/user/login", http.StatusSeeOther)
 	}
 
-	r.ParseForm() // err???
+	err := r.ParseForm()
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
 
 	form := eventJoinForm{
 		EventID: r.PostForm.Get("eventID"),
