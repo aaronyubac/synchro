@@ -97,16 +97,97 @@ func (app *application) eventCreatePost(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	id, err := app.events.Create(form.Name, form.Details)
+	eventID, err := app.events.Create(form.Name, form.Details)
 	if err != nil {
 		app.serverError(w, r, err)
 	}
 
+	userID := app.sessionManager.GetInt(r.Context(), "authenticatedUserID")
+	if userID == 0 {
+		http.Redirect(w, r, "/user/login", http.StatusSeeOther)
+		return
+	}
+
+	err = app.events.Join(userID, eventID)
+	if err != nil {
+		app.serverError(w, r, err)
+		return
+	}
+
 	app.sessionManager.Put(r.Context(), "flash", "Event successfully created!")
 
-	http.Redirect(w, r, fmt.Sprintf("/event/%d", id), http.StatusSeeOther)
+	http.Redirect(w, r, fmt.Sprintf("/event/%d", eventID), http.StatusSeeOther)
 }
 
+type eventJoinForm struct {
+	EventID string
+	validator.Validator
+}
+
+func (app *application) eventJoinGet(w http.ResponseWriter, r *http.Request) {
+	data := app.newTemplateData(r)
+	data.Form = eventJoinForm{}
+	app.render(w, r, http.StatusOK, "join.tmpl.html", data)
+}
+
+func (app *application) eventJoinPost(w http.ResponseWriter, r *http.Request) {
+
+	userID := app.sessionManager.GetInt(r.Context(), "authenticatedUserID")
+	if userID == 0 {
+		http.Redirect(w, r, "/user/login", http.StatusSeeOther)
+		return
+	}
+
+	err := r.ParseForm()
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+
+	form := eventJoinForm{
+		EventID: r.PostForm.Get("eventID"),
+	}
+
+	form.CheckField(validator.NotBlank(form.EventID), "eventID", "This field cannot be left blank")
+
+	if !form.Valid() {
+		data := app.newTemplateData(r)
+		data.Form = form
+		app.render(w, r, http.StatusUnprocessableEntity, "join.tmpl.html", data)
+		return
+	}
+
+	eventID, err := strconv.Atoi(form.EventID)
+	if err != nil {
+		app.serverError(w, r, err)
+		return
+	}
+
+	err = app.events.Join(userID, eventID)
+	if err != nil {
+		if errors.Is(err, models.ErrNoRecord) {
+
+			form.AddNonFieldError("Invalid Event ID")
+
+			data := app.newTemplateData(r)
+			data.Form = form
+			app.render(w, r, http.StatusNotFound, "join.tmpl.html", data)
+			
+		} else if errors.Is(err, models.ErrDuplicateEvent) {
+
+			form.AddNonFieldError("Already part of event")
+
+			data := app.newTemplateData(r)
+			data.Form = form
+			app.render(w, r, http.StatusUnprocessableEntity, "join.tmpl.html", data)
+		} else {
+			app.serverError(w, r, err)
+		}
+		return
+	}
+	
+	http.Redirect(w, r, fmt.Sprintf("/event/%s", form.EventID), http.StatusSeeOther)
+}
 
 
 func (app *application) userSignupForm(w http.ResponseWriter, r *http.Request) {
@@ -269,72 +350,5 @@ func (app *application) userLogoutPost(w http.ResponseWriter, r *http.Request) {
 
 
 
-type eventJoinForm struct {
-	EventID string
-	validator.Validator
-}
 
-func (app *application) eventJoinGet(w http.ResponseWriter, r *http.Request) {
-	data := app.newTemplateData(r)
-	data.Form = eventJoinForm{}
-	app.render(w, r, http.StatusOK, "join.tmpl.html", data)
-}
-
-func (app *application) eventJoinPost(w http.ResponseWriter, r *http.Request) {
-
-	userID := app.sessionManager.GetInt(r.Context(), "authenticatedUserID")
-	if userID == 0 {
-		http.Redirect(w, r, "/user/login", http.StatusSeeOther)
-	}
-
-	err := r.ParseForm()
-	if err != nil {
-		app.clientError(w, http.StatusBadRequest)
-		return
-	}
-
-	form := eventJoinForm{
-		EventID: r.PostForm.Get("eventID"),
-	}
-
-	form.CheckField(validator.NotBlank(form.EventID), "eventID", "This field cannot be left blank")
-
-	if !form.Valid() {
-		data := app.newTemplateData(r)
-		data.Form = form
-		app.render(w, r, http.StatusUnprocessableEntity, "join.tmpl.html", data)
-		return
-	}
-
-	eventID, err := strconv.Atoi(form.EventID)
-	if err != nil {
-		app.serverError(w, r, err)
-		return
-	}
-
-	err = app.events.Join(userID, eventID)
-	if err != nil {
-		if errors.Is(err, models.ErrNoRecord) {
-
-			form.AddNonFieldError("Invalid Event ID")
-
-			data := app.newTemplateData(r)
-			data.Form = form
-			app.render(w, r, http.StatusNotFound, "join.tmpl.html", data)
-			
-		} else if errors.Is(err, models.ErrDuplicateEvent) {
-
-			form.AddNonFieldError("Already part of event")
-
-			data := app.newTemplateData(r)
-			data.Form = form
-			app.render(w, r, http.StatusUnprocessableEntity, "join.tmpl.html", data)
-		} else {
-			app.serverError(w, r, err)
-		}
-		return
-	}
-	
-	http.Redirect(w, r, fmt.Sprintf("/event/%s", form.EventID), http.StatusSeeOther)
-}
 

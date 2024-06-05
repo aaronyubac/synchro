@@ -38,6 +38,11 @@ func (m *EventModel) Create(name, details string) (int, error) {
 func (m *EventModel) GetEvent(id int) (Event, error) {
 
 	stmt := `SELECT * FROM events WHERE event_id = ?`
+/* 
+	stmt := `SELECT e.event_id, e.event_name, e.event_details
+	 FROM events e JOIN users_events ue
+	 WHERE event_id = ?` */
+	//change stmt so that it checks if user id is linked
 
 	row := m.DB.QueryRow(stmt, id)
 
