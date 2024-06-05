@@ -23,7 +23,7 @@ func (app *application) routes() http.Handler {
 	mux.Handle("POST /user/logout", protected.ThenFunc(app.userLogoutPost))
 	mux.Handle("GET /event/create", protected.ThenFunc(app.eventCreateForm))
 	mux.Handle("POST /event/create", protected.ThenFunc(app.eventCreatePost))
-	mux.Handle("GET /event/{id}", protected.ThenFunc(app.eventView))
+	mux.Handle("GET /event/{event_id}", protected.ThenFunc(app.eventView))
 	mux.Handle("GET /event/join", protected.ThenFunc(app.eventJoinGet))
 	mux.Handle("POST /event/join", protected.ThenFunc(app.eventJoinPost))
 

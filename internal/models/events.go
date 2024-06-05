@@ -35,16 +35,16 @@ func (m *EventModel) Create(name, details string) (int, error) {
 	return int(id), err
 }
 
-func (m *EventModel) GetEvent(id int) (Event, error) {
+func (m *EventModel) GetEvent(userID, eventID int) (Event, error) {
 
-	stmt := `SELECT * FROM events WHERE event_id = ?`
-/* 
+	// stmt := `SELECT * FROM events WHERE event_id = ?`
+
 	stmt := `SELECT e.event_id, e.event_name, e.event_details
 	 FROM events e JOIN users_events ue
-	 WHERE event_id = ?` */
-	//change stmt so that it checks if user id is linked
+	 ON e.event_id = ue.event_id
+	 WHERE ue.user_id = ? AND e.event_id = ?`
 
-	row := m.DB.QueryRow(stmt, id)
+	row := m.DB.QueryRow(stmt, userID, eventID)
 
 	var e Event
 

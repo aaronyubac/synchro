@@ -32,13 +32,19 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 
 func (app *application) eventView(w http.ResponseWriter, r *http.Request) {
 
-	id, err := strconv.Atoi(r.PathValue("id"))
-	if err != nil || id < 1 {
+	eventID, err := strconv.Atoi(r.PathValue("event_id"))
+	if err != nil || eventID < 1 {
 		app.serverError(w, r, err)
 		return 
 	}
+
+	userID := app.sessionManager.GetInt(r.Context(), "authenticatedUserID")
+	if userID == 0 {
+		http.Redirect(w, r, "user/login", http.StatusSeeOther)
+		return
+	}
 	
-	event, err := app.events.GetEvent(id)
+	event, err := app.events.GetEvent(userID, eventID)
 	if err != nil {
 		if errors.Is(err, models.ErrNoRecord) {
 			app.clientError(w, http.StatusNotFound) // CREATE app.NotFound as a wrapper around clientError?
