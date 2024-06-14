@@ -1,0 +1,55 @@
+{{define "calendar"}}
+
+<div class="container">
+    <div class="calendar">
+        <div class="header">
+            <div class="month"></div>
+            <div class="btns">
+                <div class="btn today-btn">
+                    <i class="fa fa-calendar"></i>
+                </div>
+                <div class="btn prev-btn">
+                    <i class="fa fa-chevron-left"></i>
+                </div>
+                <div class="btn next-btn">
+                    <i class="fa fa-chevron-right"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="weekdays">
+            <div class="day">Sun</div>
+            <div class="day">Mon</div>
+            <div class="day">Tue</div>
+            <div class="day">Wed</div>
+            <div class="day">Thu</div>
+            <div class="day">Fri</div>
+            <div class="day">Sat</div>
+        </div>
+
+        <div class="days">
+            <!-- PREV MONTH DAYS -->
+            <div class="day prev">28</div>
+            <div class="day prev">29</div>
+            <div class="day prev">30</div>
+
+            <div class="day">1</div>
+            <div class="day">2</div>
+            <div class="day">3</div>
+            <div class="day today">4</div>
+            <div class="day">5</div>
+            <div class="day">6</div>
+            <div class="day">7</div>
+
+            <!-- NEXT MONTH DAYS -->
+            <div class="day next">1</div>
+            <div class="day next">2</div>
+            <div class="day next">3</div>
+            
+        </div>
+    </div>
+</div>
+
+    <script src="/static/js/calendar.js"></script>
+
+{{end}}

@@ -1,12 +1,13 @@
 {{define "nav"}}
-    <div>
-        {{if .IsAuthenticated}}
-            <form action="/user/logout" method="POST">
-                <button>Logout</button>
-            </form>
-        {{else}}
-            <a href="/user/signup">Signup</a>
-            <a href="/user/login">Login</a>
-        {{end}}
-    </div>
+  {{if .IsAuthenticated}}
+  <a href="/">Home</a>
+  <a href="/event/create">Create</a>
+  <a href="/event/join">Join</a>
+  <form action="/user/logout" method="POST">
+    <button class="logout-btn">Logout</button>
+  </form>
+  {{else}}
+  <a href="/user/signup">Signup</a>
+  <a href="/user/login">Login</a>
+  {{end}}
 {{end}}

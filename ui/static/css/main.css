@@ -1,0 +1,80 @@
+/* 
+
+Green?: #00A676
+Orange: #FFAF87
+Red: #90323d
+
+
+
+
+    #035C49
+Main Green: #009879
+    #05A787
+    #06AC8B
+Orange: #EAAC8B
+Red: #A3320B
+Grey: #1e212b
+*/
+
+:root {
+    --primary-color: #009879;
+    --text-color: #1e212b;
+    --bg-color: #f1f1fb;
+}
+
+.logo {
+    height: 80px;
+    width: 100px;
+}
+
+.main-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 40px;
+}
+
+body {
+    font-family: sans-serif;
+    background-color: white;
+}
+
+
+a:link {
+    color: white;
+    text-decoration: none;
+}
+
+a:visited {
+    color: white;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+
+h1 a:link, h1 a:visited {
+    font-size: 20px;
+    /* color: #3d8c40; */
+    /* color: #2f9e44; */
+    /* color: #2b8a3e; */
+    color: #00A676;
+}
+
+
+nav {
+    display: flex;
+    gap: 10px;
+    background-color: #181818;
+    padding: 0px 10px;
+}
+
+.logout-btn {
+    border: none;
+}
+
+.logout-btn:hover {
+    background-color: red;
+}

@@ -37,8 +37,6 @@ func (m *EventModel) Create(name, details string) (int, error) {
 
 func (m *EventModel) GetEvent(userID, eventID int) (Event, error) {
 
-	// stmt := `SELECT * FROM events WHERE event_id = ?`
-
 	stmt := `SELECT e.event_id, e.event_name, e.event_details
 	 FROM events e JOIN users_events ue
 	 ON e.event_id = ue.event_id
