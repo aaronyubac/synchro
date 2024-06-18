@@ -1,13 +1,9 @@
 {{define "title"}}Event View{{end}}
 
 {{define "main"}}
-    {{with .Event}}
-    <p>Id {{.ID}}</p>
-    <p>Name {{.Name}}</p>
-    <p>Details {{.Details}}</p>
+    {{template "tablet" .}}
 
     <div>
         {{template "calendar" .}}
     </div>
-    {{end}}
 {{end}}

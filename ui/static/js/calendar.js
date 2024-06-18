@@ -30,6 +30,8 @@ let currentMonth = date.getMonth();
 // get current year
 let currentYear = date.getFullYear();
 
+let selectedDay, selectedMonth, selectedYear;
+
 // function to render days
 function renderCalendar() {
 
@@ -62,9 +64,9 @@ function renderCalendar() {
             currentMonth === new Date().getMonth() &&
             currentYear === new Date().getFullYear()
         ) {
-            days += `<div class="day today">${i}</div>`;
+            days += `<div class="day current today" onclick="selectDate(this)">${i}</div>`;
         } else {
-            days += `<div class="day">${i}</div>`;
+            days += `<div class="day current" onclick="selectDate(this)">${i}</div>`;
         }
     }
 
@@ -74,10 +76,18 @@ function renderCalendar() {
         days += `<div class="day next">${j}</div>`;
     }
 
-    hideTodaBtn();
+    hideTodayBtn();
     daysContainer.innerHTML = days;
 
-
+    // save selected day
+    let dayElems = document.getElementsByClassName("current");
+    for (let i = 0; i < dayElems.length; i++) {
+        
+        if (currentYear == selectedYear && currentMonth == selectedMonth && (i + 1) == selectedDay) {
+            dayElems[i].classList.add("active");
+            console.log(i);
+        }
+    }
 }
 
 renderCalendar();
@@ -91,6 +101,7 @@ nextBtn.addEventListener("click", () => {
     }
 
     renderCalendar();
+
 });
 
 prevBtn.addEventListener("click", () => {
@@ -109,7 +120,7 @@ todayBtn.addEventListener("click", () => {
     renderCalendar();
 });
 
-function hideTodaBtn() {
+function hideTodayBtn() {
     if(
         currentMonth == new Date().getMonth() &&
         currentYear == new Date().getFullYear()
@@ -117,5 +128,33 @@ function hideTodaBtn() {
         todayBtn.style.display = "none";
     } else {
         todayBtn.style.display = "flex";
+    }
+}
+
+function selectDate(elem) {
+    
+let days = document.getElementsByClassName("day");
+
+    for (let i = 0; i < days.length; i++) {
+        days[i].classList.remove("active");
+    }
+
+    elem.classList.add("active");
+
+    for (let i = 0; i < days.length; i++) {
+        if (days[i].classList.contains("active")) {
+            selectedYear = currentYear;
+            selectedMonth = currentMonth;
+            selectedDay = elem.innerHTML;
+
+            let formMonth = selectedMonth + 1, formDay = selectedDay;
+
+            if (formMonth < 10) formMonth = "0" + formMonth;
+            if (formDay < 10) formDay = "0" + formDay;
+
+            let formDate = currentYear + "-" + formMonth + "-" + formDay;
+
+            document.getElementById("form-date").value = formDate;
+      }
     }
 }

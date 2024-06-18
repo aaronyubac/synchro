@@ -11,7 +11,8 @@ type Event struct {
 	ID int
 	Name string
 	Details string
-	// Unavailabilities []time.Time
+	// Unavailabilities []Unavailability
+	// Users []users
 }
 
 type EventModel struct {

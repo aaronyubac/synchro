@@ -102,7 +102,7 @@
     transition: all 0.3s;
 }
 
-.days .day:not(.next):not(.prev):hover {
+.days .day:not(.next):not(.prev):not(.active):hover {
     color: #fff;
     background-color: #05A787;
     transform: scale(1.05);
@@ -116,5 +116,9 @@
 .days .day.next, 
 .days .day.prev{
     color: #ccc;
+}
+
+.days .day:not(.today).active {
+    background-color: red;
 }
 
