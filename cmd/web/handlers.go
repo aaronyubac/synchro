@@ -118,32 +118,35 @@ func (app *application) unavailabilityAdd(w http.ResponseWriter, r *http.Request
 		}	
 	}
 
-	parsedStart := time.Time{}
-	parsedEnd := time.Time{}
+	startDateTime := parsedDate
+	endDateTime := parsedDate.Add(time.Hour * 23 + time.Minute * 59)
 
 	if !unavailabilityAllDayBool {
 	
 
 		// MAKE TIMEZONE NOT HARDCODED
 		timeLayout := "15:04 -0700 PDT"
-		parsedStart, err = time.Parse(timeLayout, fmt.Sprintf("%s -0700 PDT", startStr))
+		parsedStartTime, err := time.Parse(timeLayout, fmt.Sprintf("%s -0700 PDT", startStr))
 		if err != nil {
 			form.CheckField(validator.NotBlank(startStr), "time", "Enter a valid time")
 		}
 
-		parsedEnd, err = time.Parse(timeLayout, fmt.Sprintf("%s -0700 PDT", endStr))
+		parsedEndTime, err := time.Parse(timeLayout, fmt.Sprintf("%s -0700 PDT", endStr))
 		if err != nil {
 			form.CheckField(validator.NotBlank(startStr), "time", "Enter a valid time")
 		}
 
 		
 		if validator.NotBlank(startStr) && validator.NotBlank(endStr) {
-		form.CheckField(validator.UnavailabilityTimeRange(parsedStart, parsedEnd), "time", "Enter a valid time range")
+		form.CheckField(validator.UnavailabilityTimeRange(parsedStartTime, parsedEndTime), "time", "Enter a valid time range")
 		}
 		// check for user overlapping with previous unavailabilities
+		
+		startDateTime = parsedDate.Add(time.Hour * time.Duration(parsedStartTime.Hour()) + time.Minute * time.Duration(parsedStartTime.Minute()))
+		endDateTime = parsedDate.Add(time.Hour * time.Duration(parsedEndTime.Hour()) + time.Minute * time.Duration(parsedEndTime.Minute()))
 	}
 	
-		form.CheckField(validator.UnavailabilityNotPassed(parsedDate, parsedStart, parsedEnd), "unavailabilityDate", "Selected time/date has passed")
+	form.CheckField(validator.UnavailabilityNotPassed(startDateTime), "unavailabilityDate", "Selected time/date has passed")
 
 	if !form.Valid() {
 		
@@ -151,7 +154,7 @@ func (app *application) unavailabilityAdd(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	app.unavailabilities.Add(userId, eventId, parsedDate, form.Start, form.End, unavailabilityAllDayBool)
+	app.unavailabilities.Add(userId, eventId, startDateTime.Format("2006-01-02 15:04:05"), endDateTime.Format("2006-01-2 15:04:05"), unavailabilityAllDayBool)
 	if err != nil {
 		app.clientError(w, http.StatusBadRequest)
 		return

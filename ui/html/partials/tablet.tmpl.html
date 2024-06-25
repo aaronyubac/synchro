@@ -69,7 +69,27 @@
 
   <div id="user-unavailabilities" class="tabcontent"></div>
 
-  <div id="users-unavailabilities" class="tabcontent"></div>
+  <div id="users-unavailabilities" class="tabcontent">
+   {{if .Unavailabilities}}
+    <table>
+      <tr>
+        <th>User</th>
+        <th>Start</th>
+        <th>End</th>
+      </tr>
+      {{range .Unavailabilities}}
+      <tr>
+        <td>{{.UserId}}</td>
+        <td>{{.Start}}</td>
+        <td>{{.End}}</td>
+      </tr>
+      {{end}}
+    </table>
+
+    {{else}}
+    <p>No Unavailabilities</p>
+    {{end}}
+  </div>
 
   <div id="add-unavailability" class="tabcontent">
     <form method="post" action="/event/{{.Event.ID}}">

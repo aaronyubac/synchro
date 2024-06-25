@@ -48,10 +48,9 @@ func UnavailabilityTimeRange(start, end time.Time) bool {
 	return start.Before(end)
 }
 
-func UnavailabilityNotPassed(date, start, end time.Time) bool {
+func UnavailabilityNotPassed(start time.Time) bool {
 	currentDate := time.Now()
 
-	startDate := date.Add(time.Hour * time.Duration(start.Hour()) + time.Minute * time.Duration(start.Minute()))
 
-	return currentDate.Before(startDate)
+	return currentDate.Before(start)
 }
