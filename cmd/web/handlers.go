@@ -7,17 +7,14 @@ import (
 	"strconv"
 	"synchro/internal/models"
 	"synchro/internal/validator"
+	"time"
 )
 
 func (app *application) home(w http.ResponseWriter, r *http.Request) {
 	
-	userID := app.sessionManager.GetInt(r.Context(), "authenticatedUserID")
-	if userID == 0 {
-		http.Redirect(w, r, "/user/login", http.StatusSeeOther)
-		return
-	}
+	userId := app.sessionManager.GetInt(r.Context(), "authenticatedUserID")
 
-	events, err := app.events.GetUserEvents(userID)
+	events, err := app.events.GetUserEvents(userId)
 	if err != nil {
 		app.serverError(w, r, err)
 		return
@@ -32,34 +29,136 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 
 func (app *application) eventView(w http.ResponseWriter, r *http.Request) {
 
-	eventID, err := strconv.Atoi(r.PathValue("event_id"))
-	if err != nil || eventID < 1 {
+	eventId, err := strconv.Atoi(r.PathValue("event_id"))
+	if err != nil || eventId < 1 {
 		app.serverError(w, r, err)
 		return 
 	}
 
-	userID := app.sessionManager.GetInt(r.Context(), "authenticatedUserID")
-	if userID == 0 {
+	userId := app.sessionManager.GetInt(r.Context(), "authenticatedUserID")
+	if userId == 0 {
 		http.Redirect(w, r, "user/login", http.StatusSeeOther)
 		return
 	}
+
+	app.eventViewRenderer(w, r, userId, eventId, unavailabilityForm{})
 	
-	event, err := app.events.GetEvent(userID, eventID)
+	// event, err := app.events.GetEvent(userId, eventId)
+	// if err != nil {
+	// 	if errors.Is(err, models.ErrNoRecord) {
+	// 		app.clientError(w, http.StatusNotFound) // CREATE app.NotFound as a wrapper around clientError?
+	// 	} else {
+	// 		app.serverError(w, r, err)
+	// 	}
+	// 	return
+	// }
+
+	// data := app.newTemplateData(r)
+	// data.Event = event
+	// data.Form = unavailabilityForm{}
+
+	// app.render(w, r, http.StatusOK, "view.tmpl.html", data)
+
+	
+}
+
+type unavailabilityForm struct {
+	Date string
+	AllDay string
+	Start string
+	End string
+	validator.Validator
+}
+
+func (app *application) unavailabilityAdd(w http.ResponseWriter, r *http.Request) {
+
+	userId := app.sessionManager.GetInt(r.Context(), "authenticatedUserID")
+	eventId, err := strconv.Atoi(r.PathValue("event_id"))	
+	if err != nil || eventId < 1 {
+		app.serverError(w, r, err)
+		return 
+	}
+
+	
+	form := unavailabilityForm{}
+
+	err = r.ParseForm();
 	if err != nil {
-		if errors.Is(err, models.ErrNoRecord) {
-			app.clientError(w, http.StatusNotFound) // CREATE app.NotFound as a wrapper around clientError?
-		} else {
-			app.serverError(w, r, err)
-		}
+		app.clientError(w, http.StatusBadRequest)
 		return
-	}	
+	}
 
-	data := app.newTemplateData(r)
-	data.Event = event
+	dateStr := r.PostForm.Get("unavailability-date")
+	startStr := r.PostForm.Get("unavailability-time-start")
+	endStr := r.PostForm.Get("unavailability-time-end")
+	unavailabilityAllDayStr := r.PostForm.Get("unavailability-all-day")
 
-	app.render(w, r, http.StatusOK, "view.tmpl.html", data)
 
+	form = unavailabilityForm{
+		Date: dateStr,
+		AllDay: unavailabilityAllDayStr,
+		Start: startStr,
+		End: endStr,
+	}
+
+	dateLayout := "2006-01-02 -0700"
+	parsedDate, err := time.Parse(dateLayout, fmt.Sprintf("%s -0700", dateStr))
+	if err != nil {
+		form.AddFieldError("unavailabilityDate", "Select a valid date")
+	}
+
+
+	unavailabilityAllDayBool := false;
+
+	if unavailabilityAllDayStr != "" {
+		unavailabilityAllDayBool, err = strconv.ParseBool(unavailabilityAllDayStr)
+		if err != nil {
+			app.clientError(w, http.StatusBadRequest)
+			return
+		}	
+	}
+
+	parsedStart := time.Time{}
+	parsedEnd := time.Time{}
+
+	if !unavailabilityAllDayBool {
 	
+
+		// MAKE TIMEZONE NOT HARDCODED
+		timeLayout := "15:04 -0700 PDT"
+		parsedStart, err = time.Parse(timeLayout, fmt.Sprintf("%s -0700 PDT", startStr))
+		if err != nil {
+			form.CheckField(validator.NotBlank(startStr), "time", "Enter a valid time")
+		}
+
+		parsedEnd, err = time.Parse(timeLayout, fmt.Sprintf("%s -0700 PDT", endStr))
+		if err != nil {
+			form.CheckField(validator.NotBlank(startStr), "time", "Enter a valid time")
+		}
+
+		
+		if validator.NotBlank(startStr) && validator.NotBlank(endStr) {
+		form.CheckField(validator.UnavailabilityTimeRange(parsedStart, parsedEnd), "time", "Enter a valid time range")
+		}
+		// check for user overlapping with previous unavailabilities
+	}
+	
+		form.CheckField(validator.UnavailabilityNotPassed(parsedDate, parsedStart, parsedEnd), "unavailabilityDate", "Selected time/date has passed")
+
+	if !form.Valid() {
+		
+		app.eventViewRenderer(w, r, userId, eventId, form)
+		return
+	}
+
+	app.unavailabilities.Add(userId, eventId, parsedDate, form.Start, form.End, unavailabilityAllDayBool)
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+
+	app.eventViewRenderer(w, r, userId, eventId, unavailabilityForm{Date: dateStr})
+
 }
 
 func (app *application) eventCreateForm(w http.ResponseWriter, r *http.Request) {
@@ -103,18 +202,18 @@ func (app *application) eventCreatePost(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	eventID, err := app.events.Create(form.Name, form.Details)
+	eventId, err := app.events.Create(form.Name, form.Details)
 	if err != nil {
 		app.serverError(w, r, err)
 	}
 
-	userID := app.sessionManager.GetInt(r.Context(), "authenticatedUserID")
-	if userID == 0 {
+	userId := app.sessionManager.GetInt(r.Context(), "authenticatedUserID")
+	if userId == 0 {
 		http.Redirect(w, r, "/user/login", http.StatusSeeOther)
 		return
 	}
 
-	err = app.events.Join(userID, eventID)
+	err = app.events.Join(userId, eventId)
 	if err != nil {
 		app.serverError(w, r, err)
 		return
@@ -122,7 +221,7 @@ func (app *application) eventCreatePost(w http.ResponseWriter, r *http.Request) 
 
 	app.sessionManager.Put(r.Context(), "flash", "Event successfully created!")
 
-	http.Redirect(w, r, fmt.Sprintf("/event/%d", eventID), http.StatusSeeOther)
+	http.Redirect(w, r, fmt.Sprintf("/event/%d", eventId), http.StatusSeeOther)
 }
 
 type eventJoinForm struct {
@@ -138,8 +237,8 @@ func (app *application) eventJoinGet(w http.ResponseWriter, r *http.Request) {
 
 func (app *application) eventJoinPost(w http.ResponseWriter, r *http.Request) {
 
-	userID := app.sessionManager.GetInt(r.Context(), "authenticatedUserID")
-	if userID == 0 {
+	userId := app.sessionManager.GetInt(r.Context(), "authenticatedUserID")
+	if userId == 0 {
 		http.Redirect(w, r, "/user/login", http.StatusSeeOther)
 		return
 	}
@@ -163,13 +262,13 @@ func (app *application) eventJoinPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	eventID, err := strconv.Atoi(form.EventID)
+	eventId, err := strconv.Atoi(form.EventID)
 	if err != nil {
 		app.serverError(w, r, err)
 		return
 	}
 
-	err = app.events.Join(userID, eventID)
+	err = app.events.Join(userId, eventId)
 	if err != nil {
 		if errors.Is(err, models.ErrNoRecord) {
 
@@ -345,16 +444,6 @@ func (app *application) userLogoutPost(w http.ResponseWriter, r *http.Request) {
 
 
 }
-
-
-
-
-
-
-
-
-
-
 
 
 

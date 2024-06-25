@@ -18,6 +18,7 @@ type application struct {
 	logger *slog.Logger
 	events *models.EventModel
 	users *models.UserModel
+	unavailabilities *models.UnavailabilityModel
 	templateCache map[string]*template.Template
 	sessionManager *scs.SessionManager
 }
@@ -51,13 +52,14 @@ func main() {
 		logger: logger,
 		events: &models.EventModel{DB: db},
 		users: &models.UserModel{DB: db},
+		unavailabilities: &models.UnavailabilityModel{DB: db},
 		templateCache: templateCache,
 		sessionManager: sessionManager,
 	}
 
 	routes := app.routes()
 
-	logger.Info("starting server", slog.String("addr", ":4000"))
+	logger.Info("starting server", slog.String("addr", "192.168.0.133:4000"))
 
 
 	err = http.ListenAndServe(":4000", routes)

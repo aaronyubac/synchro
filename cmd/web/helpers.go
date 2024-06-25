@@ -2,9 +2,11 @@ package main
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"net/http"
 	"runtime/debug"
+	"synchro/internal/models"
 )
 func (app *application) clientError(w http.ResponseWriter, status int) {
 	
@@ -63,3 +65,22 @@ func (app *application) isAuthenticated(r *http.Request) bool {
 
 	return isAuthenticated
 }
+
+func (app *application) eventViewRenderer(w http.ResponseWriter, r *http.Request, userId, eventId int, form any) {
+	event, err := app.events.GetEvent(userId, eventId)
+		if err != nil {
+			if errors.Is(err, models.ErrNoRecord) {
+				app.clientError(w, http.StatusNotFound) // CREATE app.NotFound as a wrapper around clientError?
+			} else {
+				app.serverError(w, r, err)
+			}
+		return
+		}
+
+
+		data := app.newTemplateData(r)
+		data.Event = event
+		data.Form = form
+
+		app.render(w, r, http.StatusBadRequest, "view.tmpl.html", data)
+	}

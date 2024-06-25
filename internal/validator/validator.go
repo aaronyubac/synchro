@@ -2,6 +2,7 @@ package validator
 
 import (
 	"strings"
+	"time"
 	"unicode/utf8"
 )
 
@@ -41,4 +42,16 @@ func NotBlank(value string) bool {
 
 func MaxChars(value string, n int) bool {
 	return utf8.RuneCountInString(value) <= n
+}
+
+func UnavailabilityTimeRange(start, end time.Time) bool {
+	return start.Before(end)
+}
+
+func UnavailabilityNotPassed(date, start, end time.Time) bool {
+	currentDate := time.Now()
+
+	startDate := date.Add(time.Hour * time.Duration(start.Hour()) + time.Minute * time.Duration(start.Minute()))
+
+	return currentDate.Before(startDate)
 }

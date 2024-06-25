@@ -1,4 +1,4 @@
-function openTab(evt, tabName) {
+function openTab(e, tabName) {
 
     var tabcontent, tablinks;
 
@@ -13,5 +13,25 @@ function openTab(evt, tabName) {
     }
 
     document.getElementById(tabName).style.display = "block";
-    evt.currentTarget.className += " active";
+    e.currentTarget.className += " active";
 }
+
+var checkbox = document.querySelector(".unavailability-all-day");
+
+checkbox.addEventListener("change", function() {
+    // let unavailabilityTimeInputs = document.querySelector(".unavailability-time");
+    let unavailabilityStart = document.querySelector(".unavailability-time-start");
+    let unavailabilityEnd = document.querySelector(".unavailability-time-end");
+
+    if (this.checked) {
+        // unavailabilityTimeInput.style.display = "none";
+        unavailabilityStart.disabled = true;
+        unavailabilityEnd.disabled = true;
+        unavailabilityStart.value = "";
+        unavailabilityEnd.value = "";
+    } else {
+        // unavailabilityTimeInput.style.display = "inline-block";
+        unavailabilityStart.disabled = false;
+        unavailabilityEnd.disabled = false;
+    }
+})

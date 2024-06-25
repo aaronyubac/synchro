@@ -11,8 +11,6 @@ type Event struct {
 	ID int
 	Name string
 	Details string
-	// Unavailabilities []Unavailability
-	// Users []users
 }
 
 type EventModel struct {

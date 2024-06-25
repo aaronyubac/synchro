@@ -2,7 +2,7 @@
     width: 300px;
     height: 400px;
     border: 2px solid black;
-    border-radius: 4px;
+    border-radius: 3px;
 }
 
 .tab {
@@ -34,4 +34,8 @@
     padding: 6px 12px;
     border: 1px solid #ccc;
     border-top: none;
+}
+
+.unavailability-date-input {
+    display: none;
 }

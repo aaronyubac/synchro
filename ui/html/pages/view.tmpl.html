@@ -1,9 +1,13 @@
-{{define "title"}}Event View{{end}}
+{{define "title"}}Event View{{end}} {{define "main"}}
 
-{{define "main"}}
-    {{template "tablet" .}}
-
-    <div>
+<div class="view-container">
+    <div class="calendar">
         {{template "calendar" .}}
     </div>
+
+     <div class="tablet">
+        {{template "tablet" .}}
+    </div>
+</div>
+
 {{end}}
