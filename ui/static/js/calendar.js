@@ -45,7 +45,14 @@ function renderCalendar() {
   const nextDays = 7 - lastDayIndex - 1;
 
   // update current year and month in header
-  month.innerHTML = `${months[currentMonth]} ${currentYear}`;
+  
+  if (displayDate.toString() == "Invalid Date") {
+    month.innerHTML = `${months[currentMonth]} ${currentYear}`;
+  } else {
+    currentMonth = selectedDate[1] - 1;
+    currentYear = selectedDate[0];
+    month.innerHTML = `${months[currentMonth]} ${currentYear}`;
+  }
 
   // update days html
   let days = "";
@@ -169,7 +176,7 @@ currentDayElems = document.querySelectorAll(".current");
           let formDate = selectedYear + "-" + formMonth + "-" + formDay;
           document.querySelector(".unavailability-date-input").value = formDate;
 
-          selectedDate =  document.querySelector(".unavailability-date-input").value.split("-");
+          let selectedDate =  document.querySelector(".unavailability-date-input").value.split("-");
           let displayDate = new Date(selectedDate[0], selectedDate[1] - 1, selectedDate[2]).toLocaleDateString("en-us", {year:"numeric", month:"short", day:"numeric"});
           document.querySelector(".unavailability-date-display").innerHTML = displayDate;
         }
