@@ -59,6 +59,7 @@
     </button>
   </div>
 
+
   <div id="event-details" class="tabcontent">
     {{with .Event}}
     <p>Id {{.ID}}</p>
@@ -70,27 +71,15 @@
   <div id="user-unavailabilities" class="tabcontent"></div>
 
   <div id="users-unavailabilities" class="tabcontent">
-   {{if .Unavailabilities}}
     <table>
-      <tr>
+      <thead>
         <th>User</th>
         <th>Start</th>
         <th>End</th>
-      </tr>
-      {{range .Unavailabilities}}
-      <tr>
-        <td>{{.UserId}}</td>
-        <td>{{.Start}}</td>
-        <td>{{.End}}</td>
-      </tr>
-      {{end}}
+      </thead>
+      <tbody class="unavailability-list"></tbody>
     </table>
-
-    {{else}}
-    <p>No Unavailabilities</p>
-    {{end}}
   </div>
-
   <div id="add-unavailability" class="tabcontent">
     <form method="post" action="/event/{{.Event.ID}}">
       <input
@@ -147,31 +136,5 @@
   </div>
 </div>
 
-<script>
-  window.onload = function () {
-    document.getElementById("defaultOpen").click();
-  };
-  selectedDate = document
-    .querySelector(".unavailability-date-input")
-    .value.split("-");
-  let displayDate = new Date(
-    selectedDate[0],
-    selectedDate[1],
-    selectedDate[2]
-  ).toLocaleDateString("en-us", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  });
-  if (displayDate.toString() == "Invalid Date") {
-    document.querySelector(".unavailability-date-display").innerHTML =
-      "Select a date";
-  } else {
-    document.querySelector(".unavailability-date-display").innerHTML =
-      displayDate;
-  }
-  renderCalendar();
-</script>
 
-<script src="/static/js/tablet.js"></script>
 {{end}}

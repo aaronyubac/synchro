@@ -69,6 +69,8 @@ function renderCalendar() {
     }
   }
 
+
+
   // next month days
   for (let j = 1; j <= nextDays; j++) {
     days += `<div class="day next">${j}</div>`;
@@ -88,8 +90,17 @@ function renderCalendar() {
     ) {
       currentDayElems[i].classList.add("active");
     }
-  }
 
+    // unavailability data
+    let unavailabilitiesCurrent = [];
+    for (let j = 0; j < unavailabilities.length; j++) {
+    let start = new Date(unavailabilities[j].start)
+      if (i + 1 == start.getDate() && currentMonth == start.getMonth() && currentYear == start.getFullYear()) {
+        unavailabilitiesCurrent.push(unavailabilities[j]);
+      }
+    }
+        currentDayElems[i].setAttribute("data-unavailabilities", JSON.stringify(unavailabilitiesCurrent));
+  }
   
 }
 
@@ -141,6 +152,8 @@ currentDayElems = document.querySelectorAll(".current");
 
       e.classList.add("active");
 
+      loadUnavailabilityTableData();
+
       for (let i = 0; i < currentDayElems.length; i++) {
         if (currentDayElems[i].classList.contains("active")) {
           selectedYear = currentYear;
@@ -157,7 +170,7 @@ currentDayElems = document.querySelectorAll(".current");
           document.querySelector(".unavailability-date-input").value = formDate;
 
           selectedDate =  document.querySelector(".unavailability-date-input").value.split("-");
-          let displayDate = new Date(selectedDate[0], selectedDate[1], selectedDate[2]).toLocaleDateString("en-us", {year:"numeric", month:"short", day:"numeric"});
+          let displayDate = new Date(selectedDate[0], selectedDate[1] - 1, selectedDate[2]).toLocaleDateString("en-us", {year:"numeric", month:"short", day:"numeric"});
           document.querySelector(".unavailability-date-display").innerHTML = displayDate;
         }
       }

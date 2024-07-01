@@ -10,8 +10,8 @@ type Unavailability struct {
 	UserId int
 	UnavailabilityId int
 	AllDay bool
-	Start time.Time
-	End time.Time
+	Start string
+	End string 
 }
 
 type UnavailabilityModel struct {
@@ -35,7 +35,8 @@ func (m *UnavailabilityModel) Add(userId, eventId int, start, end string, allDay
 
 func (m *UnavailabilityModel) GetAllUnavailabilities(eventId int) ([]Unavailability, error) {
 	
-	stmt := `SELECT * FROM unavailabilities WHERE event_id = ?`
+	stmt := `SELECT * FROM unavailabilities WHERE event_id = ?
+				ORDER BY start`
 
 	rows, err := m.DB.Query(stmt, eventId)
 	if err != nil {
@@ -52,8 +53,21 @@ func (m *UnavailabilityModel) GetAllUnavailabilities(eventId int) ([]Unavailabil
 		err := rows.Scan(&u.EventId, &u.UserId, &u.UnavailabilityId, &u.AllDay, &u.Start, &u.End)
 		if err != nil {
 			return nil, err
+		}	
+
+		start, err := time.Parse(time.RFC3339, u.Start)
+		if err != nil {
+			return nil, err
 		}
 
+		end, err := time.Parse(time.RFC3339, u.End)
+		if err != nil {
+			return nil, err
+		}
+
+		u.Start = start.Format(time.RFC3339)
+		u.End = end.Format(time.RFC3339)
+		
 		unavailabilities = append(unavailabilities, u)
 	}
 

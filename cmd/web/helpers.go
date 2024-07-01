@@ -83,11 +83,10 @@ func (app *application) eventViewRenderer(w http.ResponseWriter, r *http.Request
 			return
 		}
 
-
 		data := app.newTemplateData(r)
 		data.Event = event
 		data.Form = form
 		data.Unavailabilities = unavailabilities
 
-		app.render(w, r, http.StatusBadRequest, "view.tmpl.html", data)
+		app.render(w, r, http.StatusOK, "view.tmpl.html", data)
 	}

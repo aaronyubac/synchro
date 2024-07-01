@@ -1,3 +1,4 @@
+
 function openTab(e, tabName) {
 
     var tabcontent, tablinks;
@@ -34,4 +35,29 @@ checkbox.addEventListener("change", function() {
         unavailabilityStart.disabled = false;
         unavailabilityEnd.disabled = false;
     }
-})
+});
+
+function loadUnavailabilityTableData() {
+    let current = document.querySelector(".days .day.active");
+    if (current != null) {
+        let unavailabilityData = JSON.parse(current.dataset.unavailabilities);
+    
+
+    const table = document.querySelector(".unavailability-list")
+    table.innerHTML = "";
+
+    unavailabilityData.forEach( item => {
+        let row = table.insertRow();
+        let user = row.insertCell(0);
+        let start = row.insertCell(1);
+        let end = row.insertCell(2);
+
+        startTime = new Date(item.start).toLocaleTimeString('en-us');
+        endTime = new Date(item.end).toLocaleTimeString('en-us');
+
+        user.innerHTML = item.userId;
+        start.innerHTML = startTime;
+        end.innerHTML = endTime;
+    });
+    }
+}

@@ -1,5 +1,18 @@
 {{define "title"}}Event View{{end}} {{define "main"}}
 
+<script>
+
+    var unavailabilities = [];
+    
+    {{range .Unavailabilities}}
+        unavailabilities.push({"eventId":"{{.EventId}}", "userId":"{{.UserId}}", "unavailabilityId":"{{.UnavailabilityId}}",
+                                "allDay":"{{.AllDay}}",
+                                "start":"{{.Start}}",
+                                "end":"{{.End}}"
+                            });
+    {{end}}
+</script>
+
 <div class="view-container">
     <div class="calendar">
         {{template "calendar" .}}
@@ -9,5 +22,37 @@
         {{template "tablet" .}}
     </div>
 </div>
+
+
+
+<script src="/static/js/tablet.js"></script>
+
+<script src="/static/js/calendar.js"></script>
+
+<script>
+  window.onload = function () {
+    document.getElementById("defaultOpen").click();
+  };
+  selectedDate = document.querySelector(".unavailability-date-input").value.split("-");
+  let displayDate = new Date(
+    selectedDate[0],
+    selectedDate[1],
+    selectedDate[2]
+  ).toLocaleDateString("en-us", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+  if (displayDate.toString() == "Invalid Date") {
+    document.querySelector(".unavailability-date-display").innerHTML =
+      "Select a date";
+  } else {
+    document.querySelector(".unavailability-date-display").innerHTML =
+      displayDate;
+  }
+  renderCalendar();
+  loadUnavailabilityTableData();
+</script>
+
 
 {{end}}
