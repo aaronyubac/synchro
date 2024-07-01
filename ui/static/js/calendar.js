@@ -34,6 +34,10 @@ let selectedDay, selectedMonth, selectedYear;
 
 // function to render days
 function renderCalendar() {
+
+
+
+
   // get prev month, current month, and next month days
   date.setDate(1);
   const firstDay = new Date(currentYear, currentMonth, 1);
@@ -43,16 +47,12 @@ function renderCalendar() {
   const prevLastDay = new Date(currentYear, currentMonth, 0);
   const prevLastDayDate = prevLastDay.getDate();
   const nextDays = 7 - lastDayIndex - 1;
-
+  
   // update current year and month in header
   
-  if (displayDate.toString() == "Invalid Date") {
     month.innerHTML = `${months[currentMonth]} ${currentYear}`;
-  } else {
-    currentMonth = selectedDate[1] - 1;
-    currentYear = selectedDate[0];
-    month.innerHTML = `${months[currentMonth]} ${currentYear}`;
-  }
+
+
 
   // update days html
   let days = "";

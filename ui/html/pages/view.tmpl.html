@@ -46,11 +46,16 @@
   if (displayDate.toString() == "Invalid Date") {
     document.querySelector(".unavailability-date-display").innerHTML =
       "Select a date";
+    
   } else {
     document.querySelector(".unavailability-date-display").innerHTML =
       displayDate;
+      currentMonth = selectedDate[1] - 1;
+      currentYear = selectedDate[0];
+
   }
   renderCalendar();
+  
   loadUnavailabilityTableData();
 </script>
 

@@ -101,12 +101,11 @@ func (app *application) unavailabilityAdd(w http.ResponseWriter, r *http.Request
 		End: endStr,
 	}
 
-	dateLayout := "2006-01-02 -0700"
-	parsedDate, err := time.Parse(dateLayout, fmt.Sprintf("%s -0700", dateStr))
+	dateLayout := "2006-01-02"
+	parsedDate, err := time.Parse(dateLayout, dateStr)
 	if err != nil {
 		form.AddFieldError("unavailabilityDate", "Select a valid date")
 	}
-
 
 	unavailabilityAllDayBool := false;
 
@@ -123,8 +122,6 @@ func (app *application) unavailabilityAdd(w http.ResponseWriter, r *http.Request
 
 	if !unavailabilityAllDayBool {
 	
-
-		// MAKE TIMEZONE NOT HARDCODED
 		timeLayout := "15:04 -0700 PDT"
 		parsedStartTime, err := time.Parse(timeLayout, fmt.Sprintf("%s -0700 PDT", startStr))
 		if err != nil {
@@ -136,7 +133,10 @@ func (app *application) unavailabilityAdd(w http.ResponseWriter, r *http.Request
 			form.CheckField(validator.NotBlank(startStr), "time", "Enter a valid time")
 		}
 
-		
+		// convert pdt to utc
+		parsedStartTime = parsedStartTime.UTC()
+		parsedEndTime = parsedEndTime.UTC()
+
 		if validator.NotBlank(startStr) && validator.NotBlank(endStr) {
 		form.CheckField(validator.UnavailabilityTimeRange(parsedStartTime, parsedEndTime), "time", "Enter a valid time range")
 		}
@@ -145,7 +145,7 @@ func (app *application) unavailabilityAdd(w http.ResponseWriter, r *http.Request
 		startDateTime = parsedDate.Add(time.Hour * time.Duration(parsedStartTime.Hour()) + time.Minute * time.Duration(parsedStartTime.Minute()))
 		endDateTime = parsedDate.Add(time.Hour * time.Duration(parsedEndTime.Hour()) + time.Minute * time.Duration(parsedEndTime.Minute()))
 	}
-	
+
 	form.CheckField(validator.UnavailabilityNotPassed(startDateTime), "unavailabilityDate", "Selected time/date has passed")
 
 	if !form.Valid() {
