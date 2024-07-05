@@ -54,7 +54,7 @@ func (m *UnavailabilityModel) GetAllUnavailabilities(eventId int) ([]Unavailabil
 		if err != nil {
 			return nil, err
 		}	
-
+		
 		start, err := time.Parse(time.RFC3339, u.Start)
 		if err != nil {
 			return nil, err
@@ -65,8 +65,13 @@ func (m *UnavailabilityModel) GetAllUnavailabilities(eventId int) ([]Unavailabil
 			return nil, err
 		}
 
-		u.Start = start.Format(time.RFC3339)
-		u.End = end.Format(time.RFC3339)
+		// convert utc to pdt
+		start = start.Local()
+		end = end.Local()
+
+		u.Start = start.String()
+		u.End = end.String()
+
 		
 		unavailabilities = append(unavailabilities, u)
 	}

@@ -97,6 +97,14 @@
   transition: all 0.3s;
 }
 
+.days .day.allDay {
+  background-color: #D52941;
+}
+
+.days .day.partial {
+  background-color: #E59F71;
+}
+
 .days .day:not(.next):not(.prev):not(.active):hover {
   color: #fff;
   filter: brightness(115%);
@@ -105,8 +113,22 @@
 
 .days .day.today {
   color: #fff;
+  /* border: 3px inset #1e212b; */
+  /* transform: scale(1.14); */
+}
+
+.days .day.today:not(.allDay):not(.partial) {
   background-color: #035c49;
 }
+
+.days .day.today.partial:not(.allDay) {
+  background-color: #c26224
+}
+
+.days .day.today.allDay {
+  background-color: #A3320B;
+}
+
 
 .days .day.next,
 .days .day.prev {

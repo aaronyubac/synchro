@@ -51,8 +51,7 @@
     document.querySelector(".unavailability-date-display").innerHTML =
       displayDate;
       currentMonth = selectedDate[1] - 1;
-      currentYear = selectedDate[0];
-
+      currentYear = Number(selectedDate[0]);
   }
   renderCalendar();
   

@@ -101,8 +101,15 @@ function renderCalendar() {
     // unavailability data
     let unavailabilitiesCurrent = [];
     for (let j = 0; j < unavailabilities.length; j++) {
-    let start = new Date(unavailabilities[j].start)
-      if (i + 1 == start.getDate() && currentMonth == start.getMonth() && currentYear == start.getFullYear()) {
+    let start = new Date(unavailabilities[j].start);
+      if (i + 1 == start.getUTCDate() && currentMonth == start.getUTCMonth() && currentYear == start.getUTCFullYear()) {
+        if (unavailabilities[j].allDay === 'true') {
+          currentDayElems[i].classList.add("allDay")
+        } else {
+          if (!currentDayElems[i].classList.contains("allDay")) {
+             currentDayElems[i].classList.add("partial")
+          }
+        }
         unavailabilitiesCurrent.push(unavailabilities[j]);
       }
     }
