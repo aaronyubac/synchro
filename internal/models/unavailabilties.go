@@ -25,15 +25,14 @@ func (m *UnavailabilityModel) Add(userId, eventId int, start, end string, allDay
 
 
 	_, err := m.DB.Exec(stmt, eventId, userId, allDay, start, end)
-
 	if err != nil {
-		return err
+		return  err
 	}
 
 	return nil
 }
 
-func (m *UnavailabilityModel) GetAllUnavailabilities(eventId int) ([]Unavailability, error) {
+func (m *UnavailabilityModel) GetEventUnavailabilities(eventId int) ([]Unavailability, error) {
 	
 	stmt := `SELECT * FROM unavailabilities WHERE event_id = ?
 				ORDER BY start`
@@ -81,4 +80,14 @@ func (m *UnavailabilityModel) GetAllUnavailabilities(eventId int) ([]Unavailabil
 	}
 
 	return unavailabilities, nil
+}
+func (m *UnavailabilityModel) RemoveUserUnavailability(userId, unavailabilityId int) error {
+
+	stmt := `DELETE FROM unavailabilities WHERE user_id = ? AND unavailability_id = ?`
+
+	_, err := m.DB.Exec(stmt, userId, unavailabilityId)
+	if err != nil {
+		return err
+	}
+	return nil
 }

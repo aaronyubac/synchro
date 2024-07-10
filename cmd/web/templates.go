@@ -8,9 +8,10 @@ import (
 
 type templateData struct {
 	Form any
+	User models.User
 	Event models.Event
 	Events []models.Event
-	Unavailabilities []models.Unavailability
+	EventUnavailabilities []models.Unavailability
 	Flash string
 	IsAuthenticated bool // so that we can toggle the contents of the navigation bar
 }

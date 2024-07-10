@@ -100,6 +100,7 @@ function renderCalendar() {
 
     // unavailability data
     let unavailabilitiesCurrent = [];
+    let userUnavailabilitiesCurrent = [];
     for (let j = 0; j < unavailabilities.length; j++) {
     let start = new Date(unavailabilities[j].start);
       if (i + 1 == start.getUTCDate() && currentMonth == start.getUTCMonth() && currentYear == start.getUTCFullYear()) {
@@ -111,9 +112,14 @@ function renderCalendar() {
           }
         }
         unavailabilitiesCurrent.push(unavailabilities[j]);
+
+        if (unavailabilities[j].userId === user.id) {
+          userUnavailabilitiesCurrent.push(unavailabilities[j]);
+        }
+        }
       }
-    }
-        currentDayElems[i].setAttribute("data-unavailabilities", JSON.stringify(unavailabilitiesCurrent));
+        currentDayElems[i].setAttribute("data-event-unavailabilities", JSON.stringify(unavailabilitiesCurrent));
+        currentDayElems[i].setAttribute("data-user-unavailabilities", JSON.stringify(userUnavailabilitiesCurrent))
   }
   
 }

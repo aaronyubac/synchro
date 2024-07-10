@@ -1,16 +1,23 @@
 {{define "title"}}Event View{{end}} {{define "main"}}
 
 <script>
+    var user = {
+      "id":"{{.User.ID}}",
+      "name":"{{.User.Name}}",
+      "email":"{{.User.Email}}",
+    };
 
     var unavailabilities = [];
     
-    {{range .Unavailabilities}}
+    {{range .EventUnavailabilities}}
         unavailabilities.push({"eventId":"{{.EventId}}", "userId":"{{.UserId}}", "unavailabilityId":"{{.UnavailabilityId}}",
                                 "allDay":"{{.AllDay}}",
                                 "start":"{{.Start}}",
                                 "end":"{{.End}}"
                             });
     {{end}}
+
+    
 </script>
 
 <div class="view-container">

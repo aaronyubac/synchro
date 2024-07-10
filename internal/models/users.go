@@ -80,3 +80,19 @@ func (m *UserModel) Exists(id int) (bool, error) {
 
 	return exists, err
 }
+
+func (m *UserModel) GetUser(id int) (User, error) {
+
+	stmt := "SELECT user_id, user_name, email FROM users WHERE user_id = ?"
+
+	row := m.DB.QueryRow(stmt, id)
+
+	var u User
+
+	err := row.Scan(&u.ID, &u.Name, &u.Email)
+	if err != nil {
+		return User{}, err
+	}
+
+	return u, nil
+}

@@ -77,16 +77,23 @@ func (app *application) eventViewRenderer(w http.ResponseWriter, r *http.Request
 		return
 		}
 
-	unavailabilities, err := app.unavailabilities.GetAllUnavailabilities(eventId)
+	eventUnavailabilities, err := app.unavailabilities.GetEventUnavailabilities(eventId)
+		if err != nil {
+			app.serverError(w, r, err)
+			return
+		}
+
+		user, err := app.users.GetUser(userId)
 		if err != nil {
 			app.serverError(w, r, err)
 			return
 		}
 
 		data := app.newTemplateData(r)
+		data.User = user
 		data.Event = event
 		data.Form = form
-		data.Unavailabilities = unavailabilities
+		data.EventUnavailabilities = eventUnavailabilities
 
 		app.render(w, r, http.StatusOK, "view.tmpl.html", data)
 	}

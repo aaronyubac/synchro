@@ -68,18 +68,20 @@
     {{end}}
   </div>
 
-  <div id="user-unavailabilities" class="tabcontent"></div>
-
-  <div id="users-unavailabilities" class="tabcontent">
+  <div id="user-unavailabilities" class="tabcontent">
     <table>
       <thead>
-        <th>User</th>
         <th>Start</th>
         <th>End</th>
         <th>All Day</th>
-      </thead>
+        <th></th>
+      </thead> 
       <tbody class="unavailability-list"></tbody>
     </table>
+  </div>
+
+  <div id="users-unavailabilities" class="tabcontent">
+
   </div>
   <div id="add-unavailability" class="tabcontent">
     <form method="post" action="/event/{{.Event.ID}}">
@@ -129,8 +131,6 @@
         <br />
         {{end}}
       </div>
-
-      <!-- if no selected date can't submit -->
 
       <input type="submit" value="Add Unavailability" />
     </form>

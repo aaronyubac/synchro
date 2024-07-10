@@ -13,6 +13,10 @@ import (
 func (app *application) home(w http.ResponseWriter, r *http.Request) {
 	
 	userId := app.sessionManager.GetInt(r.Context(), "authenticatedUserID")
+	if userId == 0 {
+		http.Redirect(w, r, "/user/login", http.StatusSeeOther)
+		return
+	}
 
 	events, err := app.events.GetUserEvents(userId)
 	if err != nil {
@@ -161,6 +165,49 @@ func (app *application) unavailabilityAdd(w http.ResponseWriter, r *http.Request
 	}
 
 	app.eventViewRenderer(w, r, userId, eventId, unavailabilityForm{Date: dateStr})
+
+}
+
+func (app *application) unavailabilityRemove(w http.ResponseWriter, r *http.Request) {
+	
+	userId := app.sessionManager.GetInt(r.Context(), "authenticatedUserID")
+	if userId == 0 {
+		http.Redirect(w, r, "/user/login", http.StatusSeeOther)
+		return
+	}
+
+	err := r.ParseForm()
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+
+	formUserId, err := strconv.Atoi(r.PostForm.Get("userId"))
+	if err != nil {
+		app.serverError(w, r, err)
+		return
+	}
+
+	if userId == formUserId {
+
+		unavailabilityId, err := strconv.Atoi(r.PostForm.Get("unavailabilityId"))
+		if err != nil {
+			app.serverError(w, r, err)
+			return
+		}
+
+		app.unavailabilities.RemoveUserUnavailability(userId, unavailabilityId)
+
+	} 
+
+	eventId, err := strconv.Atoi(r.PostForm.Get("eventId"))
+	if err != nil {
+		app.serverError(w, r, err)
+		return
+	}
+
+	http.Redirect(w, r, fmt.Sprintf("/event/%d", eventId), http.StatusSeeOther)
+
 
 }
 
@@ -444,8 +491,6 @@ func (app *application) userLogoutPost(w http.ResponseWriter, r *http.Request) {
 	app.sessionManager.Put(r.Context(), "flash", "You have been logged out successfully")
 
 	http.Redirect(w, r, "/", http.StatusSeeOther)
-
-
 }
 
 
