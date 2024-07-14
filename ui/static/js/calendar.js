@@ -101,9 +101,17 @@ function renderCalendar() {
     // unavailability data
     let unavailabilitiesCurrent = [];
     let userUnavailabilitiesCurrent = [];
+    
     for (let j = 0; j < unavailabilities.length; j++) {
-    let start = new Date(unavailabilities[j].start);
-      if (i + 1 == start.getUTCDate() && currentMonth == start.getUTCMonth() && currentYear == start.getUTCFullYear()) {
+      let start = new Date(unavailabilities[j].start);
+
+    if (unavailabilities[j].allDay === 'true') {
+
+      // due to way full day is stored in database
+      start = new Date(start.getFullYear(), start.getMonth(), start.getDate() + 1, start.getUTCHours(), start.getUTCMinutes());
+
+    } 
+      if (i + 1 == start.getDate() && currentMonth == start.getMonth() && currentYear == start.getFullYear()) {
         if (unavailabilities[j].allDay === 'true') {
           currentDayElems[i].classList.add("allDay")
         } else {
@@ -118,11 +126,13 @@ function renderCalendar() {
         }
         }
       }
+    
         currentDayElems[i].setAttribute("data-event-unavailabilities", JSON.stringify(unavailabilitiesCurrent));
-        currentDayElems[i].setAttribute("data-user-unavailabilities", JSON.stringify(userUnavailabilitiesCurrent))
+        currentDayElems[i].setAttribute("data-user-unavailabilities", JSON.stringify(userUnavailabilitiesCurrent));
+    }
   }
   
-}
+
 
 
 nextBtn.addEventListener("click", () => {
@@ -173,6 +183,7 @@ currentDayElems = document.querySelectorAll(".current");
       e.classList.add("active");
 
       loadUnavailabilityTableData();
+      unavailabilitiesToBar();
 
       for (let i = 0; i < currentDayElems.length; i++) {
         if (currentDayElems[i].classList.contains("active")) {

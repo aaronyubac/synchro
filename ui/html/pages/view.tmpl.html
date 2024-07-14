@@ -35,6 +35,7 @@
 <script src="/static/js/tablet.js"></script>
 
 <script src="/static/js/calendar.js"></script>
+<script src="/static/js/timebar.js"></script>
 
 <script>
   window.onload = function () {
@@ -63,6 +64,8 @@
   renderCalendar();
   
   loadUnavailabilityTableData();
+  renderTimeslots();
+  unavailabilitiesToBar();
 </script>
 
 

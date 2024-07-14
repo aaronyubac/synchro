@@ -1,7 +1,6 @@
 package validator
 
 import (
-	"fmt"
 	"strings"
 	"time"
 	"unicode/utf8"
@@ -50,9 +49,7 @@ func UnavailabilityTimeRange(start, end time.Time) bool {
 }
 
 func UnavailabilityNotPassed(start time.Time) bool {
-	currentDate := time.Now().UTC()
-	fmt.Println(currentDate)
-
+	currentDate := time.Now()
 
 	return currentDate.Before(start)
 }

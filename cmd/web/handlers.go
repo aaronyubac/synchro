@@ -141,16 +141,18 @@ func (app *application) unavailabilityAdd(w http.ResponseWriter, r *http.Request
 		parsedStartTime = parsedStartTime.UTC()
 		parsedEndTime = parsedEndTime.UTC()
 
+		// check for user overlapping with previous unavailabilities
+		
 		if validator.NotBlank(startStr) && validator.NotBlank(endStr) {
 		form.CheckField(validator.UnavailabilityTimeRange(parsedStartTime, parsedEndTime), "time", "Enter a valid time range")
 		}
-		// check for user overlapping with previous unavailabilities
-		
-		startDateTime = parsedDate.Add(time.Hour * time.Duration(parsedStartTime.Hour()) + time.Minute * time.Duration(parsedStartTime.Minute()))
-		endDateTime = parsedDate.Add(time.Hour * time.Duration(parsedEndTime.Hour()) + time.Minute * time.Duration(parsedEndTime.Minute()))
+
+		startDateTime = parsedDate.Add(((time.Hour * 24) * time.Duration(parsedStartTime.Day() - 1))+ time.Hour * time.Duration(parsedStartTime.Hour()) + time.Minute * time.Duration(parsedStartTime.Minute()))
+		endDateTime = parsedDate.Add(((time.Hour * 24) * time.Duration(parsedStartTime.Day() - 1)) + time.Hour * time.Duration(parsedEndTime.Hour()) + time.Minute * time.Duration(parsedEndTime.Minute()))
 	}
 
 	form.CheckField(validator.UnavailabilityNotPassed(startDateTime), "unavailabilityDate", "Selected time/date has passed")
+
 
 	if !form.Valid() {
 		
