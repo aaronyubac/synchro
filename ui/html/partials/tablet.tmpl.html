@@ -69,6 +69,19 @@
   </div>
 
   <div id="user-unavailabilities" class="tabcontent">
+
+    <h3>Your Availability</h3>
+    <div class="user timebar">
+      <div class="am">
+          <div class="timebar-grid"></div>
+      </div>
+
+        <div class="pm">
+          <div class="timebar-grid"></di>
+        </div>
+      </div>
+    </div>
+
     <table>
       <thead>
         <th>Start</th>
@@ -81,14 +94,20 @@
   </div>
 
   <div id="users-unavailabilities" class="tabcontent">
-    <div class="timebar am">
-      <div class="timebar-grid"></div>
-    </div>
+    <h3>Event Availability</h3>
+    <div class="event timebar">
+      <div class="am">
+        <div class="timebar-grid"></div>
+      </div>
 
-    <div class="timebar pm">
-      <div class="timebar-grid"></div>
+      <div class="pm">
+        <div class="timebar-grid"></di>
+      </div>
     </div>
   </div>
+  </div>
+
+
   <div id="add-unavailability" class="tabcontent">
     <form method="post" action="/event/{{.Event.ID}}">
       <input

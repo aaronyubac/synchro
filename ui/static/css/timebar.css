@@ -1,53 +1,58 @@
 .timebar {
-    display:inline-block;
-    margin: 50px 0px;
-    align-self: center;
+    display: flex;
+    justify-content:space-between;
+    align-items: center;
+    flex-grow: 1;
+    padding: 20px 10px;
 }
 
 .timebar-grid {
     display: flex;
+    flex-direction: column-reverse;
     border: 2px solid black;
     background-color: #009879;
-    height: 30px;
-    width: 250px;
+    height: 250px;
+    width: 30px;
 }
 
 
 .time-slot {
     flex-grow: 1;
-    height: 250%;
     position:relative;
-    display:flex;
-    flex-direction: column;
+    height: 100%;
 }
 
 .time-box {
-    /* border: 1px dashed pink; */
-    width: 100%;
-    height:26px;
-    align-self: flex-start;
+    flex-grow: 1;
 }
 
-.time-slot .time-box.allDay {
+.time-slot.allDay {
     background-color: #D52941;
   }
   
-.time-slot .time-box.partial:not(.allDay) {
+.time-slot.partial:not(.allDay) {
     background-color: #E59F71;
   }
 
 
 .time-marker {
-    writing-mode: vertical-rl;
-    text-orientation: upright;
     position:absolute;
-    /* bottom: -4px; */
-    /* right: -7px; */
+    width: 42px;
     font-size: 10px;
     font-weight: 500;
+    bottom: -2px;
+}
+
+.am .time-marker {
+    right: -46px;
+}
+
+.pm .time-marker {
+    left: -46px;
 }
 
 .time-marker-start {
-    left: -7px;
-    right: auto;
+    bottom: -8px;
+    right: -46px;
+    display: none;
 }
