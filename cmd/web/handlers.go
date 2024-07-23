@@ -131,6 +131,9 @@ func (app *application) unavailabilityAdd(w http.ResponseWriter, r *http.Request
 		form.CheckField(validator.UnavailabilityTimeRange(parsedStartTime, parsedEndTime), "time", "Enter a valid time range")
 		}
 
+		form.CheckField(validator.PermittedMinutes(parsedStartTime), "time", "Minutes must be a multiple of 15")
+		form.CheckField(validator.PermittedMinutes(parsedEndTime), "time", "Minutes must be a multiple of 15")
+
 		startDateTime = parsedDate.Add(((time.Hour * 24) * time.Duration(parsedStartTime.Day() - 1))+ time.Hour * time.Duration(parsedStartTime.Hour()) + time.Minute * time.Duration(parsedStartTime.Minute()))
 		endDateTime = parsedDate.Add(((time.Hour * 24) * time.Duration(parsedStartTime.Day() - 1)) + time.Hour * time.Duration(parsedEndTime.Hour()) + time.Minute * time.Duration(parsedEndTime.Minute()))
 	}

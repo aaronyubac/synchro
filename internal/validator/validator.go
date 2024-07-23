@@ -1,6 +1,7 @@
 package validator
 
 import (
+	"slices"
 	"strings"
 	"time"
 	"unicode/utf8"
@@ -52,4 +53,11 @@ func UnavailabilityNotPassed(start time.Time) bool {
 	currentDate := time.Now()
 
 	return currentDate.Before(start)
+}
+
+func PermittedMinutes(time time.Time) bool {
+	minutes := time.Minute()
+	permittedMinutes := []int{0, 15, 30, 45}
+
+	return slices.Contains(permittedMinutes, minutes)
 }

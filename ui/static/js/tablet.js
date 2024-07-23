@@ -20,18 +20,15 @@ function openTab(e, tabName) {
 var checkbox = document.querySelector(".unavailability-all-day");
 
 checkbox.addEventListener("change", function() {
-    // let unavailabilityTimeInputs = document.querySelector(".unavailability-time");
     let unavailabilityStart = document.querySelector(".unavailability-time-start");
     let unavailabilityEnd = document.querySelector(".unavailability-time-end");
 
     if (this.checked) {
-        // unavailabilityTimeInput.style.display = "none";
         unavailabilityStart.disabled = true;
         unavailabilityEnd.disabled = true;
         unavailabilityStart.value = "";
         unavailabilityEnd.value = "";
     } else {
-        // unavailabilityTimeInput.style.display = "inline-block";
         unavailabilityStart.disabled = false;
         unavailabilityEnd.disabled = false;
     }
@@ -88,3 +85,23 @@ function loadUnavailabilityTableData() {
     });
     }
 }
+
+function incrementTimepicker() {
+    console.log("Increment running");
+    let timepickers = document.querySelectorAll(".time-picker");
+    timepickers.forEach(timepicker => {
+      timepicker.addEventListener("change", function() {
+
+        let [hours, minutes] = timepicker.value.split(":");
+
+        minutes = (Math.ceil(minutes / 15) * 15);
+        if (minutes == 0) minutes = "00";
+        if (minutes == 60) {minutes = "00"; ++hours % 24; }
+
+        let newValue = hours + ":" + minutes;
+
+        timepicker.value = newValue;
+    });
+});
+}
+
