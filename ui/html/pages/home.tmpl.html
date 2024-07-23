@@ -1,27 +1,39 @@
-{{define "title"}}Home{{end}}
+{{define "title"}}Home{{end}} 
+    
+
+{{define "header"}}
+{{template "nav" .}}
+{{end}}
 
 {{define "main"}}
-    <h2>Your Events</h2>
+
+<div class="home-container">
     {{if .Events}}
-    <table>
-        <tr>
-            <th>Name</th>
-            <th>Details</th>
-            <th>ID</th>
+    <div class="table-container">
+        <h2>Your Events</h2>
+        <table class="event-table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Details</th>
+          <th>ID</th>
         </tr>
+    </thead>
+    <tbody>
         {{range .Events}}
         <tr>
             <td><a href="/event/{{.ID}}">{{.Name}}</a></td>
             <td>{{.Details}}</td>
             <td>{{.ID}}</td>
-            <!-- Current Set Date -->
         </tr>
         {{end}}
-    </table>
-    {{else}}
-    <p>No Events</p>
-    {{end}}
+    </tbody>
+  </table>
+</div>
+{{else}}
+<p>No Events</p>
+{{end}}
 
-    <!-- CALENDER ON SIDE WITH SET DATES -->
+
 
 {{end}}

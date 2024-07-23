@@ -13,8 +13,9 @@ type templateData struct {
 	Events []models.Event
 	EventUnavailabilities []models.Unavailability
 	Flash string
-	IsAuthenticated bool // so that we can toggle the contents of the navigation bar
+	IsAuthenticated bool
 }
+
 
 func newTemplateCache() (map[string]*template.Template, error) {
 

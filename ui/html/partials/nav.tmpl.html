@@ -1,13 +1,96 @@
 {{define "nav"}}
+
+<div class="main-header">
+  <a href="/"><img class="logo" src="/static/img/synchro-logo.svg" /></a>
+
+  <nav>
   {{if .IsAuthenticated}}
+  <div>
   <a href="/">Home</a>
-  <a href="/event/create">Create</a>
-  <a href="/event/join">Join</a>
+    <button class="btn-open-create" onclick="toggleCreate()">
+      <p>Create</p>
+    </button>
+    
+    <button class="btn-open-join" onclick="toggleJoin()">
+      <p>Join</p>
+    </button>
+  </div>
+
+<div class="user-options">
   <form action="/user/logout" method="POST">
     <button class="logout-btn">Logout</button>
   </form>
-  {{else}}
-  <a href="/user/signup">Signup</a>
-  <a href="/user/login">Login</a>
+</div>
+</nav>
   {{end}}
+
+  <div class="overlay-container">
+  </div>
+  <div class="create-popup">
+    <h2>Create Event</h2>
+    
+    <form action="/event/create" method="POST">
+      <div>
+        <label>Event Name: </label>
+        {{with .Form.FieldErrors.name}}
+        <label class="error">{{.}}</label>
+        {{end}}
+        <input class="event-name" type="text" name="name" maxlength="100" required/>
+      </div>
+      <div>
+        <label>Details: </label>
+        {{with .Form.FieldErrors.details}}
+            <label class="error">{{.}}</label>
+            {{end}}
+            <textarea name="details" maxlength="1023"></textarea>
+          </div>
+          <div>
+            <input type="submit" value="Create Event" />
+          </div>
+        </form>
+      </div>
+      
+      <div class="join-popup">
+        <h2>Join Event</h2>
+        
+        <form action="/event/join" method="POST">
+          <div>
+            {{range .Form.NonFieldErrors}}
+            <label class="error">{{.}}</label>
+            {{end}}
+          </div>
+          <div>
+            <input type="text" name="eventID" required>
+          </div>
+          <div>
+            <input type="submit" value="Join">
+          </div>
+        </form>
+      </div>
+    </div>
+      
+      
+      
+  <script>
+  const overlay = document.querySelector(".overlay-container");
+  const create = document.querySelector(".create-popup");
+  const join = document.querySelector(".join-popup");
+  
+  function toggleCreate() {
+    overlay.classList.toggle("show");
+    create.classList.toggle("show");
+  }
+  
+  function toggleJoin() {
+    overlay.classList.toggle("show");
+    join.classList.toggle("show");
+    }
+  
+    overlay.onclick = function() {
+      overlay.classList.toggle("show");
+      create.classList = "create-popup";
+      join.classList = "join-popup";
+    }
+  
+  </script> 
 {{end}}

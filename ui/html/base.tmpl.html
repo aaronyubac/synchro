@@ -11,13 +11,11 @@
     <link rel="stylesheet" href="/static/css/timebar.css"
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   </head>
+
+  <header>
+    {{template "header" .}}
+  </header>
   <body>
-
-    <header class="main-header">
-      <a href="/"><img class="logo" src="/static/img/synchro-logo.svg" /></a>
-
-      <nav>{{template "nav" .}}</nav>
-    </header>
 
     <main>
       {{with .Flash}}

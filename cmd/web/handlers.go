@@ -25,6 +25,7 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 	}
 
 	data := app.newTemplateData(r)
+	data.Form = eventCreateForm{}
 	data.Events = events
 
 	app.render(w, r, http.StatusOK, "home.tmpl.html", data)
@@ -46,23 +47,6 @@ func (app *application) eventView(w http.ResponseWriter, r *http.Request) {
 	}
 
 	app.eventViewRenderer(w, r, userId, eventId, unavailabilityForm{})
-	
-	// event, err := app.events.GetEvent(userId, eventId)
-	// if err != nil {
-	// 	if errors.Is(err, models.ErrNoRecord) {
-	// 		app.clientError(w, http.StatusNotFound) // CREATE app.NotFound as a wrapper around clientError?
-	// 	} else {
-	// 		app.serverError(w, r, err)
-	// 	}
-	// 	return
-	// }
-
-	// data := app.newTemplateData(r)
-	// data.Event = event
-	// data.Form = unavailabilityForm{}
-
-	// app.render(w, r, http.StatusOK, "view.tmpl.html", data)
-
 	
 }
 
@@ -213,15 +197,6 @@ func (app *application) unavailabilityRemove(w http.ResponseWriter, r *http.Requ
 
 }
 
-func (app *application) eventCreateForm(w http.ResponseWriter, r *http.Request) {
-
-	data := app.newTemplateData(r)
-	data.Form = eventCreateForm{}
-
-	app.render(w, r, http.StatusOK, "create.tmpl.html", data)
-
-}
-
 type eventCreateForm struct {
 	Name string
 	Details string
@@ -248,9 +223,7 @@ func (app *application) eventCreatePost(w http.ResponseWriter, r *http.Request) 
 		form.CheckField(validator.MaxChars(form.Details, 1023), "details", "This field cannot be more than 1023 characters long")
 	
 	if !form.Valid() {
-		data := app.newTemplateData(r)
-		data.Form = form
-		app.render(w, r, http.StatusBadRequest, "create.tmpl.html", data)
+		http.Redirect(w, r, "/", http.StatusBadRequest)
 		return
 	}
 
@@ -281,11 +254,6 @@ type eventJoinForm struct {
 	validator.Validator
 }
 
-func (app *application) eventJoinGet(w http.ResponseWriter, r *http.Request) {
-	data := app.newTemplateData(r)
-	data.Form = eventJoinForm{}
-	app.render(w, r, http.StatusOK, "join.tmpl.html", data)
-}
 
 func (app *application) eventJoinPost(w http.ResponseWriter, r *http.Request) {
 
@@ -308,9 +276,7 @@ func (app *application) eventJoinPost(w http.ResponseWriter, r *http.Request) {
 	form.CheckField(validator.NotBlank(form.EventID), "eventID", "This field cannot be left blank")
 
 	if !form.Valid() {
-		data := app.newTemplateData(r)
-		data.Form = form
-		app.render(w, r, http.StatusUnprocessableEntity, "join.tmpl.html", data)
+		http.Redirect(w, r, "/", http.StatusBadRequest)
 		return
 	}
 
@@ -323,25 +289,19 @@ func (app *application) eventJoinPost(w http.ResponseWriter, r *http.Request) {
 	err = app.events.Join(userId, eventId)
 	if err != nil {
 		if errors.Is(err, models.ErrNoRecord) {
-
 			form.AddNonFieldError("Invalid Event ID")
-
-			data := app.newTemplateData(r)
-			data.Form = form
-			app.render(w, r, http.StatusNotFound, "join.tmpl.html", data)
+			http.Redirect(w, r, "/", http.StatusSeeOther)
 			
 		} else if errors.Is(err, models.ErrDuplicateEvent) {
-
 			form.AddNonFieldError("Already part of event")
-
-			data := app.newTemplateData(r)
-			data.Form = form
-			app.render(w, r, http.StatusUnprocessableEntity, "join.tmpl.html", data)
+			http.Redirect(w, r, "/", http.StatusSeeOther)
 		} else {
 			app.serverError(w, r, err)
+			http.Redirect(w, r, "/", http.StatusSeeOther)
 		}
 		return
 	}
+
 	
 	http.Redirect(w, r, fmt.Sprintf("/event/%s", form.EventID), http.StatusSeeOther)
 }
