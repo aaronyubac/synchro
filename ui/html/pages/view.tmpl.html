@@ -26,14 +26,20 @@
 
     
 </script>
+{{range .Form.NonFieldErrors}}
+<div class="error">{{.}}</div>
+<br>
+{{end}}
+
 
 <div class="view-container">
+
     <div class="calendar">
         {{template "calendar" .}}
     </div>
 
-     <div class="tablet">
-        {{template "tablet" .}}
+    <div class="tablet">
+       {{template "tablet" .}}
     </div>
 </div>
 

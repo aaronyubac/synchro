@@ -7,6 +7,10 @@
 
 <div class="signup-background">
 
+  {{with .Flash}}
+  <div class="flash">{{.}}</div>
+  {{end}}
+
     <img class="logo" src="/static/img/synchro-logo-white.svg" />
 
   <div class="signup-container">

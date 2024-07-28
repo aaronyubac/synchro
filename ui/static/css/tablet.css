@@ -43,3 +43,27 @@
     display: none;
 }
 
+.unavailability-table {
+    width: 100%;
+    display: none;
+}
+
+.unavailability-table caption {
+    font-size: 18px;
+    font-weight: bolder;
+}
+
+.unavailability-list td {
+    text-align: center;
+}
+
+.unavailability-list button {
+    background: none;
+    border: none;
+    padding: 0;
+}
+
+.unavailability-list button:hover svg{
+    fill: red;
+}
+

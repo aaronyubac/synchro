@@ -46,7 +46,7 @@ func (app *application) eventView(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	app.eventViewRenderer(w, r, userId, eventId, unavailabilityForm{})
+	app.eventViewRenderer(w, r, userId, eventId, unavailabilityForm{}, http.StatusOK)
 	
 }
 
@@ -138,12 +138,12 @@ func (app *application) unavailabilityAdd(w http.ResponseWriter, r *http.Request
 		endDateTime = parsedDate.Add(((time.Hour * 24) * time.Duration(parsedStartTime.Day() - 1)) + time.Hour * time.Duration(parsedEndTime.Hour()) + time.Minute * time.Duration(parsedEndTime.Minute()))
 	}
 
-	form.CheckField(validator.UnavailabilityNotPassed(startDateTime), "unavailabilityDate", "Selected time/date has passed")
+	form.CheckField(validator.TimeNotPassed(startDateTime), "unavailabilityDate", "Selected time/date has passed")
 
 
 	if !form.Valid() {
-		
-		app.eventViewRenderer(w, r, userId, eventId, form)
+		form.AddNonFieldError("Failed to add unavailability")
+		app.eventViewRenderer(w, r, userId, eventId, form, http.StatusUnprocessableEntity)
 		return
 	}
 
@@ -153,7 +153,7 @@ func (app *application) unavailabilityAdd(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	app.eventViewRenderer(w, r, userId, eventId, unavailabilityForm{Date: dateStr})
+	app.eventViewRenderer(w, r, userId, eventId, unavailabilityForm{Date: dateStr}, http.StatusOK)
 
 }
 
@@ -285,7 +285,7 @@ func (app *application) eventJoinPost(w http.ResponseWriter, r *http.Request) {
 
 	eventId, err := strconv.Atoi(form.EventID)
 	if err != nil {
-		app.serverError(w, r, err)
+		app.clientError(w, http.StatusBadRequest)
 		return
 	}
 
