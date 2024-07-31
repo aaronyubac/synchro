@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/tls"
 	"database/sql"
 	"flag"
 	"log/slog"
@@ -10,6 +11,7 @@ import (
 	"text/template"
 	"time"
 
+	"github.com/alexedwards/scs/mysqlstore"
 	"github.com/alexedwards/scs/v2"
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -25,6 +27,7 @@ type application struct {
 
 func main() {
 
+	addr := flag.String("addr", ":4000", "HTTP network address")
 
 	flag.Parse()
 
@@ -44,9 +47,9 @@ func main() {
 	}
 
 	sessionManager := scs.New()
-	// sessionManager.Store = **** make it so session stored in sql database rather than in memory
+	sessionManager.Store = mysqlstore.New(db)
 	sessionManager.Lifetime = 12 * time.Hour
-	// sessionManager.Cookie.Secure = true
+	sessionManager.Cookie.Secure = true
 
 	app := &application{
 		logger: logger,
@@ -57,13 +60,27 @@ func main() {
 		sessionManager: sessionManager,
 	}
 
-	routes := app.routes()
+	tlsConfig := &tls.Config{
+		CurvePreferences: []tls.CurveID{tls.X25519, tls.CurveP256},
+	}
 
-	logger.Info("starting server", slog.String("addr", "192.168.0.133:4000"))
+	srv := &http.Server {
+		Addr:	*addr,
+		Handler: app.routes(),
+		ErrorLog: slog.NewLogLogger(logger.Handler(), slog.LevelError),
+		TLSConfig: tlsConfig,
+		IdleTimeout: 3 * time.Minute,
+		ReadTimeout: 5 * time.Second,
+		WriteTimeout: 10 * time.Second,
+	}
 
 
-	err = http.ListenAndServe(":4000", routes)
+	logger.Info("starting server", "addr", srv.Addr)
+
+
+	err = srv.ListenAndServeTLS("./tls/cert.pem", "./tls/key.pem")
 	logger.Error(err.Error())
+	os.Exit(1)
 }
 
 func openDB(dsn string) (*sql.DB, error) {

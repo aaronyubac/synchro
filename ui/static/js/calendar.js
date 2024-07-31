@@ -47,6 +47,8 @@ function renderCalendar() {
   const prevLastDay = new Date(currentYear, currentMonth, 0);
   const prevLastDayDate = prevLastDay.getDate();
   const nextDays = 7 - lastDayIndex - 1;
+
+  fmt.Println(nextDays)
   
   // update current year and month in header
   
@@ -102,12 +104,12 @@ function renderCalendar() {
     let unavailabilitiesCurrent = [];
     let userUnavailabilitiesCurrent = [];
     
-    for (let j = 0; j < unavailabilities.length; j++) {
+    for (let j = 0; j < unavailabilities.length + nextDays; j++) {
       let start = new Date(unavailabilities[j].start);
 
     if (unavailabilities[j].allDay === 'true') {
 
-      // due to way full day is stored in database
+      // due to way full day unavailability is stored in database
       start = new Date(start.getFullYear(), start.getMonth(), start.getDate() + 1, start.getUTCHours(), start.getUTCMinutes());
 
     } 

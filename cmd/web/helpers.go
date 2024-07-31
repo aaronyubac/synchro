@@ -66,7 +66,8 @@ func (app *application) isAuthenticated(r *http.Request) bool {
 	return isAuthenticated
 }
 
-func (app *application) eventViewRenderer(w http.ResponseWriter, r *http.Request, userId, eventId int, form any, status int) {
+
+func (app *application) eventViewRenderer(w http.ResponseWriter, r *http.Request, userId int, eventId string, form any, status int) {
 	event, err := app.events.GetEvent(userId, eventId)
 		if err != nil {
 			if errors.Is(err, models.ErrNoRecord) {

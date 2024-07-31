@@ -1,14 +1,16 @@
 package models
 
 import (
+	"crypto/rand"
 	"database/sql"
+	"encoding/hex"
 	"errors"
 
 	"github.com/go-sql-driver/mysql"
 )
 
 type Event struct {
-	ID int
+	ID string
 	Name string
 	Details string
 }
@@ -17,24 +19,24 @@ type EventModel struct {
 	DB *sql.DB
 }
 
-func (m *EventModel) Create(name, details string) (int, error) {
+func (m *EventModel) Create(name, details string) (string, error) {
 
-	stmt := `INSERT INTO events (event_name, event_details) VALUES(?, ?)`
-
-	result, err := m.DB.Exec(stmt, name, details)
+	code, err := generateHexCode(6)
 	if err != nil {
-		return 0, err
+		return "", err
 	}
 
-	id, err := result.LastInsertId()
+	stmt := `INSERT INTO events (event_id, event_name, event_details) VALUES(?, ?, ?)`
+
+	_, err = m.DB.Exec(stmt, code, name, details)
 	if err != nil {
-		return 0, err
+		return "", err
 	}
 
-	return int(id), err
+	return code, err
 }
 
-func (m *EventModel) GetEvent(userID, eventID int) (Event, error) {
+func (m *EventModel) GetEvent(userID int, eventID string) (Event, error) {
 
 	stmt := `SELECT e.event_id, e.event_name, e.event_details
 	 FROM events e JOIN users_events ue
@@ -99,7 +101,7 @@ func (m *EventModel) GetUserEvents(userID int) ([]Event, error) {
 
 
 
-func (m *EventModel) Join(userID, eventID int) error {
+func (m *EventModel) Join(userID int, eventID string) error {
 
 	stmt := `INSERT INTO users_events (user_id, event_id) VALUES (?, ?)`
 
@@ -117,4 +119,13 @@ func (m *EventModel) Join(userID, eventID int) error {
 	}
 
 	return nil
+}
+
+
+func generateHexCode(n int) (string, error) {
+	bytes := make([]byte, (n+1) / 2)
+	if _, err := rand.Read(bytes); err != nil {
+		return "", err
+	}
+	return hex.EncodeToString(bytes), nil
 }

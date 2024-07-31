@@ -67,3 +67,10 @@
     fill: red;
 }
 
+#event-details p {
+    overflow-wrap: break-word;
+}
+
+.event-detail {
+    font-weight: 500;
+}

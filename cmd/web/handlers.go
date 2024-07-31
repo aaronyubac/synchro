@@ -34,11 +34,13 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 
 func (app *application) eventView(w http.ResponseWriter, r *http.Request) {
 
-	eventId, err := strconv.Atoi(r.PathValue("event_id"))
-	if err != nil || eventId < 1 {
-		app.serverError(w, r, err)
-		return 
-	}
+	// eventId, err := strconv.Atoi(r.PathValue("event_id"))
+	// if err != nil || eventId < 1 {
+	// 	app.serverError(w, r, err)
+	// 	return 
+	// }
+
+	eventId := r.PathValue("event_id")
 
 	userId := app.sessionManager.GetInt(r.Context(), "authenticatedUserID")
 	if userId == 0 {
@@ -61,16 +63,12 @@ type unavailabilityForm struct {
 func (app *application) unavailabilityAdd(w http.ResponseWriter, r *http.Request) {
 
 	userId := app.sessionManager.GetInt(r.Context(), "authenticatedUserID")
-	eventId, err := strconv.Atoi(r.PathValue("event_id"))	
-	if err != nil || eventId < 1 {
-		app.serverError(w, r, err)
-		return 
-	}
+	eventId := r.PathValue("event_id")
 
 	
 	form := unavailabilityForm{}
 
-	err = r.ParseForm();
+	err := r.ParseForm();
 	if err != nil {
 		app.clientError(w, http.StatusBadRequest)
 		return
@@ -189,13 +187,9 @@ func (app *application) unavailabilityRemove(w http.ResponseWriter, r *http.Requ
 
 	} 
 
-	eventId, err := strconv.Atoi(r.PostForm.Get("eventId"))
-	if err != nil {
-		app.serverError(w, r, err)
-		return
-	}
+	eventId:= r.PostForm.Get("eventId")
 
-	http.Redirect(w, r, fmt.Sprintf("/event/%d", eventId), http.StatusSeeOther)
+	http.Redirect(w, r, fmt.Sprintf("/event/%s", eventId), http.StatusSeeOther)
 
 
 }
@@ -249,7 +243,7 @@ func (app *application) eventCreatePost(w http.ResponseWriter, r *http.Request) 
 
 	app.sessionManager.Put(r.Context(), "flash", "Event successfully created!")
 
-	http.Redirect(w, r, fmt.Sprintf("/event/%d", eventId), http.StatusSeeOther)
+	http.Redirect(w, r, fmt.Sprintf("/event/%s", eventId), http.StatusSeeOther)
 }
 
 type eventJoinForm struct {
@@ -283,13 +277,7 @@ func (app *application) eventJoinPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	eventId, err := strconv.Atoi(form.EventID)
-	if err != nil {
-		app.clientError(w, http.StatusBadRequest)
-		return
-	}
-
-	err = app.events.Join(userId, eventId)
+	err = app.events.Join(userId, form.EventID)
 	if err != nil {
 		if errors.Is(err, models.ErrNoRecord) {
 			form.AddNonFieldError("Invalid Event ID")

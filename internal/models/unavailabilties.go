@@ -6,7 +6,7 @@ import (
 )
 
 type Unavailability struct {
-	EventId int
+	EventId string
 	UserId int
 	UnavailabilityId int
 	AllDay bool
@@ -18,11 +18,10 @@ type UnavailabilityModel struct {
 	DB *sql.DB
 }
 
-func (m *UnavailabilityModel) Add(userId, eventId int, start, end string, allDay bool) error {
+func (m *UnavailabilityModel) Add(userId int, eventId string, start, end string, allDay bool) error {
 
 	stmt := `INSERT INTO unavailabilities (event_id, user_id, all_day, start, end)
 			VALUES(?, ?, ?, ?, ?);`
-
 
 	_, err := m.DB.Exec(stmt, eventId, userId, allDay, start, end)
 	if err != nil {
@@ -32,7 +31,7 @@ func (m *UnavailabilityModel) Add(userId, eventId int, start, end string, allDay
 	return nil
 }
 
-func (m *UnavailabilityModel) GetEventUnavailabilities(eventId int) ([]Unavailability, error) {
+func (m *UnavailabilityModel) GetEventUnavailabilities(eventId string) ([]Unavailability, error) {
 	
 	stmt := `SELECT * FROM unavailabilities WHERE event_id = ?
 				ORDER BY start`
@@ -81,7 +80,7 @@ func (m *UnavailabilityModel) GetEventUnavailabilities(eventId int) ([]Unavailab
 
 	return unavailabilities, nil
 }
-func (m *UnavailabilityModel) RemoveUserUnavailability(userId, unavailabilityId int) error {
+func (m *UnavailabilityModel) RemoveUserUnavailability(userId int, unavailabilityId int) error {
 
 	stmt := `DELETE FROM unavailabilities WHERE user_id = ? AND unavailability_id = ?`
 
