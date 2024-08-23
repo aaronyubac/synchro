@@ -48,8 +48,6 @@ function renderCalendar() {
   const prevLastDayDate = prevLastDay.getDate();
   const nextDays = 7 - lastDayIndex - 1;
 
-  fmt.Println(nextDays)
-  
   // update current year and month in header
   
     month.innerHTML = `${months[currentMonth]} ${currentYear}`;
