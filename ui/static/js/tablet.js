@@ -87,7 +87,8 @@ function loadUnavailabilityTableData() {
                 </button>
             </form>`;
       });
-    }
+    
+  }
   }
 }
 

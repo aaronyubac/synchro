@@ -102,33 +102,35 @@ function renderCalendar() {
     let unavailabilitiesCurrent = [];
     let userUnavailabilitiesCurrent = [];
     
-    for (let j = 0; j < unavailabilities.length + nextDays; j++) {
-      let start = new Date(unavailabilities[j].start);
+    for (let j = 0; j < unavailabilities.length; j++) {
+      if (unavailabilities.length !== 0) {
+        let start = new Date(unavailabilities[j].start);
 
-    if (unavailabilities[j].allDay === 'true') {
-
-      // due to way full day unavailability is stored in database
-      start = new Date(start.getFullYear(), start.getMonth(), start.getDate() + 1, start.getUTCHours(), start.getUTCMinutes());
-
-    } 
-      if (i + 1 == start.getDate() && currentMonth == start.getMonth() && currentYear == start.getFullYear()) {
         if (unavailabilities[j].allDay === 'true') {
-          currentDayElems[i].classList.add("allDay")
-        } else {
-          if (!currentDayElems[i].classList.contains("allDay")) {
-             currentDayElems[i].classList.add("partial")
+
+        // due to way full day unavailability is stored in database
+        start = new Date(start.getFullYear(), start.getMonth(), start.getDate() + 1, start.getUTCHours(), start.getUTCMinutes());
+
+        } 
+        if (i + 1 == start.getDate() && currentMonth == start.getMonth() && currentYear == start.getFullYear()) {
+          if (unavailabilities[j].allDay === 'true') {
+            currentDayElems[i].classList.add("allDay")
+          } else {
+            if (!currentDayElems[i].classList.contains("allDay")) {
+              currentDayElems[i].classList.add("partial")
+            }
           }
-        }
         unavailabilitiesCurrent.push(unavailabilities[j]);
 
         if (unavailabilities[j].userId === user.id) {
           userUnavailabilitiesCurrent.push(unavailabilities[j]);
         }
         }
+        
       }
-    
-        currentDayElems[i].setAttribute("data-event-unavailabilities", JSON.stringify(unavailabilitiesCurrent));
-        currentDayElems[i].setAttribute("data-user-unavailabilities", JSON.stringify(userUnavailabilitiesCurrent));
+    }
+      currentDayElems[i].setAttribute("data-event-unavailabilities", JSON.stringify(unavailabilitiesCurrent));
+      currentDayElems[i].setAttribute("data-user-unavailabilities", JSON.stringify(userUnavailabilitiesCurrent));
     }
   }
   
